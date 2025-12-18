@@ -1,10 +1,10 @@
-package com.example.tokenmanagement.repository;
+package com.example.model.repository;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.demo.tokenmanagement.model.User;
+import com.example.demo.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
