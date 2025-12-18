@@ -1,4 +1,4 @@
-package com.example.model.service;
+package com.example.service;
 
 import com.example.demo.model.QueuePosition;
 
