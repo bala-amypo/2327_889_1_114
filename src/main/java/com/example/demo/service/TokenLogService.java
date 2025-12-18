@@ -1,8 +1,8 @@
-package com.example.tokenmanagement.service;
+package com.example.model.service;
 
 import java.util.List;
 
-import com.example.demo.tokenmanagement.model.TokenLog;
+import com.example.demo.model.TokenLog;
 
 public interface TokenLogService {
 

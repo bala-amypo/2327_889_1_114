@@ -1,6 +1,6 @@
-package com.example.tokenmanagement.service;
+package com.example.model.service;
 
-import com.example.demo.tokenmanagement.model.Token;
+import com.example.demo.model.Token;
 
 public interface TokenService {
 

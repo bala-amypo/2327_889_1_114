@@ -10,8 +10,8 @@ import com.example.demo.model.exception.NotFoundException;
 import com.example.demo.model.ServiceCounter;
 import com.example.demo.model.Token;
 import com.example.demo.model.repository.ServiceCounterRepository;
-import com.example.demo.tokenmanagement.repository.TokenRepository;
-import com.example.demo.tokenmanagement.service.TokenService;
+import com.example.demo.model.repository.TokenRepository;
+import com.example.demo.model.service.TokenService;
 
 @Service
 public class TokenServiceImpl implements TokenService {
