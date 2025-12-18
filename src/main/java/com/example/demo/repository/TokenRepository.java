@@ -13,5 +13,4 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
             Long counterId, String status);
 
     Optional<Token> findByTokenNumber(String tokenNumber);
-
 }
