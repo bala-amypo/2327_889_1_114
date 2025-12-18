@@ -1,12 +1,12 @@
-package com.example.tokenmanagement.service.impl;
+package com.example.model.service.impl;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.tokenmanagement.model.ServiceCounter;
-import com.example.demo.tokenmanagement.repository.ServiceCounterRepository;
-import com.example.demo.tokenmanagement.service.ServiceCounterService;
+import com.example.demo.model.ServiceCounter;
+import com.example.demo.model.repository.ServiceCounterRepository;
+import com.example.demo.model.service.ServiceCounterService;
 
 @Service
 public class ServiceCounterServiceImpl implements ServiceCounterService {

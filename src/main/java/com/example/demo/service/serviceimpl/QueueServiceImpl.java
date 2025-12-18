@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.model.exception.NotFoundException;
 import com.example.demo.model.QueuePosition;
-import com.example.demo.tokenmanagement.model.Token;
-import com.example.demo.tokenmanagement.repository.QueuePositionRepository;
-import com.example.demo.tokenmanagement.repository.TokenRepository;
-import com.example.demo.tokenmanagement.service.QueueService;
+import com.example.demo.model.Token;
+import com.example.demo.model.repository.QueuePositionRepository;
+import com.example.demo.model.repository.TokenRepository;
+import com.example.demo.model.service.QueueService;
 
 @Service
 public class QueueServiceImpl implements QueueService {

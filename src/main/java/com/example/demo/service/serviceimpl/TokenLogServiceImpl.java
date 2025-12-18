@@ -1,16 +1,16 @@
-package com.example.tokenmanagement.service.impl;
+package com.example.model.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.tokenmanagement.exception.NotFoundException;
-import com.example.demo.tokenmanagement.model.Token;
-import com.example.demo.tokenmanagement.model.TokenLog;
-import com.example.demo.tokenmanagement.repository.TokenLogRepository;
-import com.example.demo.tokenmanagement.repository.TokenRepository;
-import com.example.demo.tokenmanagement.service.TokenLogService;
+import com.example.demo.model.exception.NotFoundException;
+import com.example.demo.model.Token;
+import com.example.demo.model.TokenLog;
+import com.example.demo.model.repository.TokenLogRepository;
+import com.example.demo.model.repository.TokenRepository;
+import com.example.demo.model.service.TokenLogService;
 
 @Service
 public class TokenLogServiceImpl implements TokenLogService {
