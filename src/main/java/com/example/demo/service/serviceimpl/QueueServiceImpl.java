@@ -1,47 +1,32 @@
-package com.example.demo.service.impl;
+package com.example.service.impl;
 
-import java.time.LocalDateTime;
-
+import com.example.model.QueuePosition;
+import com.example.repository.QueuePositionRepository;
+import com.example.service.QueueService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.example.demo.model.exception.NotFoundException;
-import com.example.demo.model.QueuePosition;
-import com.example.demo.model.Token;
-import com.example.demo.model.repository.QueuePositionRepository;
-import com.example.demo.model.repository.TokenRepository;
-import com.example.demo.model.service.QueueService;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
+@Transactional
 public class QueueServiceImpl implements QueueService {
-
-    private final QueuePositionRepository queueRepository;
-    private final TokenRepository tokenRepository;
-
-    public QueueServiceImpl(QueuePositionRepository queueRepository,
-                            TokenRepository tokenRepository) {
-        this.queueRepository = queueRepository;
-        this.tokenRepository = tokenRepository;
-    }
-
+    
+    @Autowired
+    private QueuePositionRepository queuePositionRepository;
+    
     @Override
     public QueuePosition updateQueuePosition(Long tokenId, Integer newPosition) {
-
-        Token token = tokenRepository.findById(tokenId)
-                .orElseThrow(() -> new NotFoundException("Token not found"));
-
-        QueuePosition position = queueRepository.findByToken_Id(tokenId)
-                .orElse(new QueuePosition());
-
-        position.setToken(token);
-        position.setPosition(newPosition);
-        position.setUpdatedAt(LocalDateTime.now());
-
-        return queueRepository.save(position);
+        QueuePosition queuePosition = new QueuePosition();
+        queuePosition.setTokenId(tokenId);
+        queuePosition.setPosition(newPosition);
+        queuePosition.setUpdatedAt(LocalDateTime.now());
+        return queuePositionRepository.save(queuePosition);
     }
-
+    
     @Override
-    public QueuePosition getPosition(Long tokenId) {
-        return queueRepository.findByToken_Id(tokenId)
-                .orElseThrow(() -> new NotFoundException("Queue position not found"));
+    public Optional<QueuePosition> getPosition(Long tokenId) {
+        return queuePositionRepository.findById(tokenId);
     }
 }

@@ -1,45 +1,32 @@
 package com.example.service.impl;
 
+import com.example.model.TokenLog;
+import com.example.repository.TokenLogRepository;
+import com.example.service.TokenLogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
-import com.example.demo.model.exception.NotFoundException;
-import com.example.demo.model.Token;
-import com.example.demo.model.TokenLog;
-import com.example.demo.model.repository.TokenLogRepository;
-import com.example.demo.model.repository.TokenRepository;
-import com.example.demo.model.service.TokenLogService;
-
 @Service
+@Transactional
 public class TokenLogServiceImpl implements TokenLogService {
-
-    private final TokenLogRepository logRepository;
-    private final TokenRepository tokenRepository;
-
-    public TokenLogServiceImpl(TokenLogRepository logRepository,
-                               TokenRepository tokenRepository) {
-        this.logRepository = logRepository;
-        this.tokenRepository = tokenRepository;
-    }
-
+    
+    @Autowired
+    private TokenLogRepository tokenLogRepository;
+    
     @Override
-    public void addLog(Long tokenId, String message) {
-
-        Token token = tokenRepository.findById(tokenId)
-                .orElseThrow(() -> new NotFoundException("Token not found"));
-
+    public TokenLog addLog(Long tokenId, String message) {
         TokenLog log = new TokenLog();
-        log.setToken(token);
-        log.setLogMessage(message);
-        log.setLoggedAt(LocalDateTime.now());
-
-        logRepository.save(log);
+        log.setTokenId(tokenId);
+        log.setMessage(message);
+        log.setTimestamp(LocalDateTime.now());
+        return tokenLogRepository.save(log);
     }
-
+    
     @Override
     public List<TokenLog> getLogs(Long tokenId) {
-        return logRepository.findByToken_IdOrderByLoggedAtAsc(tokenId);
+        return tokenLogRepository.findByTokenId(tokenId);
     }
 }

@@ -1,29 +1,31 @@
 package com.example.service.impl;
 
+import com.example.model.ServiceCounter;
+import com.example.repository.ServiceCounterRepository;
+import com.example.service.ServiceCounterService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
-import com.example.demo.model.ServiceCounter;
-import com.example.demo.model.repository.ServiceCounterRepository;
-import com.example.demo.model.service.ServiceCounterService;
-
 @Service
+@Transactional
 public class ServiceCounterServiceImpl implements ServiceCounterService {
-
-    private final ServiceCounterRepository counterRepository;
-
-    public ServiceCounterServiceImpl(ServiceCounterRepository counterRepository) {
-        this.counterRepository = counterRepository;
-    }
-
+    
+    @Autowired
+    private ServiceCounterRepository serviceCounterRepository;
+    
     @Override
     public ServiceCounter addCounter(ServiceCounter counter) {
-        return counterRepository.save(counter);
+        // Set default active status if not provided
+        if (counter.getIsActive() == null) {
+            counter.setIsActive(true);
+        }
+        return serviceCounterRepository.save(counter);
     }
-
+    
     @Override
     public List<ServiceCounter> getActiveCounters() {
-        return counterRepository.findByIsActiveTrue();
+        return serviceCounterRepository.findActiveCounters();
     }
 }

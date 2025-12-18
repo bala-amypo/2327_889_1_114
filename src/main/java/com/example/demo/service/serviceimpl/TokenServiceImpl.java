@@ -1,75 +1,91 @@
 package com.example.service.impl;
 
-import java.time.LocalDateTime;
-
+import com.example.model.Token;
+import com.example.repository.TokenRepository;
+import com.example.repository.ServiceCounterRepository;
+import com.example.service.TokenService;
+import com.example.service.TokenLogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.example.demo.model.exception.InvalidStatusException;
-import com.example.demo.model.exception.NotActiveException;
-import com.example.demo.model.exception.NotFoundException;
-import com.example.demo.model.ServiceCounter;
-import com.example.demo.model.Token;
-import com.example.demo.model.repository.ServiceCounterRepository;
-import com.example.demo.model.repository.TokenRepository;
-import com.example.demo.model.service.TokenService;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
+@Transactional
 public class TokenServiceImpl implements TokenService {
-
-    private final TokenRepository tokenRepository;
-    private final ServiceCounterRepository counterRepository;
-
-    public TokenServiceImpl(TokenRepository tokenRepository,
-                            ServiceCounterRepository counterRepository) {
-        this.tokenRepository = tokenRepository;
-        this.counterRepository = counterRepository;
-    }
-
+    
+    @Autowired
+    private TokenRepository tokenRepository;
+    
+    @Autowired
+    private ServiceCounterRepository serviceCounterRepository;
+    
+    @Autowired
+    private TokenLogService tokenLogService;
+    
     @Override
     public Token issueToken(Long counterId) {
-
-        ServiceCounter counter = counterRepository.findById(counterId)
-                .orElseThrow(() -> new NotFoundException("Counter not found"));
-
-        if (!counter.getIsActive()) {
-            throw new NotActiveException("Counter not active");
-        }
-
-        Token token = new Token();
-        token.setServiceCounter(counter);
-        token.setTokenNumber("TKN-" + System.currentTimeMillis());
-        token.setStatus("WAITING");
-        token.setIssuedAt(LocalDateTime.now());
-
-        return tokenRepository.save(token);
+        // Check if counter is active
+        return serviceCounterRepository.findById(counterId)
+            .filter(counter -> counter.getIsActive())
+            .map(counter -> {
+                Token token = new Token();
+                token.setCounterId(counterId);
+                token.setStatus("ISSUED");
+                token.setCreatedAt(LocalDateTime.now());
+                Token savedToken = tokenRepository.save(token);
+                
+                // Add log entry
+                tokenLogService.addLog(savedToken.getId(), "Token issued for counter: " + counterId);
+                
+                return savedToken;
+            })
+            .orElseThrow(() -> new RuntimeException("Counter not active"));
     }
-
+    
     @Override
     public Token updateStatus(Long tokenId, String status) {
-
-        Token token = tokenRepository.findById(tokenId)
-                .orElseThrow(() -> new NotFoundException("Token not found"));
-
-        String currentStatus = token.getStatus();
-
-        if (currentStatus.equals("WAITING") && status.equals("SERVING") ||
-            currentStatus.equals("SERVING") && status.equals("COMPLETED")) {
-
-            token.setStatus(status);
-
-            if (status.equals("COMPLETED")) {
-                token.setCompletedAt(LocalDateTime.now());
-            }
-
-            return tokenRepository.save(token);
-        }
-
-        throw new InvalidStatusException("Invalid status transition");
+        return tokenRepository.findByTokenId(tokenId)
+            .map(token -> {
+                String oldStatus = token.getStatus();
+                
+                // Validate status transition
+                if (!isValidTransition(oldStatus, status)) {
+                    throw new RuntimeException("Invalid status transition from " + oldStatus + " to " + status);
+                }
+                
+                token.setStatus(status);
+                token.setUpdatedAt(LocalDateTime.now());
+                Token updatedToken = tokenRepository.save(token);
+                
+                // Add log entry
+                tokenLogService.addLog(tokenId, "Status changed from " + oldStatus + " to " + status);
+                
+                return updatedToken;
+            })
+            .orElseThrow(() -> new RuntimeException("Token not found"));
     }
-
+    
     @Override
-    public Token getToken(Long tokenId) {
-        return tokenRepository.findById(tokenId)
-                .orElseThrow(() -> new NotFoundException("Token not found"));
+    public Optional<Token> getToken(Long tokenId) {
+        return tokenRepository.findByTokenId(tokenId);
+    }
+    
+    private boolean isValidTransition(String currentStatus, String newStatus) {
+        // Valid transitions: ISSUED -> CALLED -> SERVING -> COMPLETED/CANCELLED
+        switch (currentStatus) {
+            case "ISSUED":
+                return "CALLED".equals(newStatus) || "CANCELLED".equals(newStatus);
+            case "CALLED":
+                return "SERVING".equals(newStatus) || "CANCELLED".equals(newStatus);
+            case "SERVING":
+                return "COMPLETED".equals(newStatus) || "CANCELLED".equals(newStatus);
+            case "COMPLETED":
+            case "CANCELLED":
+                return false; // No transitions from terminal states
+            default:
+                return false;
+        }
     }
 }
