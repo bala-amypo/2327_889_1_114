@@ -1,10 +1,9 @@
-package com.example.queue.repository;
+package com.example.repository;
 
-import com.example.queue.model.QueuePosition;
+import com.example.model.QueuePosition;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
+@Repository
 public interface QueuePositionRepository extends JpaRepository<QueuePosition, Long> {
-    List<QueuePosition> findByToken_Id(Long tokenId);
 }
