@@ -17,7 +17,6 @@ public class ServiceCounterServiceImpl implements ServiceCounterService {
     
     @Override
     public ServiceCounter addCounter(ServiceCounter counter) {
-        // Set default active status if not provided
         if (counter.getIsActive() == null) {
             counter.setIsActive(true);
         }
