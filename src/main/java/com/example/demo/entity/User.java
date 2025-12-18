@@ -1,16 +1,27 @@
-package com.example.queue.model;
+package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @Column(nullable = false, unique = true)
+    private String username;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -18,57 +29,30 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String role; // ADMIN / STAFF
+    private UserRole role = UserRole.USER;
 
-    // No-args constructor (required by JPA)
-    public User() {
+    @Column(nullable = false)
+    private Boolean active = true;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    public enum UserRole {
+        USER,
+        ADMIN,
+        COUNTER_STAFF
     }
-
-    // Parameterized constructor
-    public User(Long id, String name, String email, String password, String role) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void
+}
