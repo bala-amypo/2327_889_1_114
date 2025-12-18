@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.tokenmanagement.model.Token;
+import com.example.demo.tokenmanagement.model.Token;
 
 public interface TokenRepository extends JpaRepository<Token, Long> {
 

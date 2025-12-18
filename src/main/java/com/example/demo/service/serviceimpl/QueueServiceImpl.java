@@ -1,15 +1,15 @@
-package com.example.tokenmanagement.service.impl;
+package com.example.demo.tokenmanagement.service.impl;
 
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
-import com.example.tokenmanagement.exception.NotFoundException;
-import com.example.tokenmanagement.model.QueuePosition;
-import com.example.tokenmanagement.model.Token;
-import com.example.tokenmanagement.repository.QueuePositionRepository;
-import com.example.tokenmanagement.repository.TokenRepository;
-import com.example.tokenmanagement.service.QueueService;
+import com.example.demo.tokenmanagement.exception.NotFoundException;
+import com.example.demo.tokenmanagement.model.QueuePosition;
+import com.example.demo.tokenmanagement.model.Token;
+import com.example.demo.tokenmanagement.repository.QueuePositionRepository;
+import com.example.demo.tokenmanagement.repository.TokenRepository;
+import com.example.demo.tokenmanagement.service.QueueService;
 
 @Service
 public class QueueServiceImpl implements QueueService {
