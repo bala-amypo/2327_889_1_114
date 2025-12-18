@@ -1,10 +1,28 @@
 package com.example.service;
 
-import com.example.demo.model.User;
+import com.example.model.User;
+import com.example.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import java.util.Optional;
 
-public interface UserService {
-
-    User register(User user);
-
-    User findByEmail(String email);
+@Service
+public class UserService {
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+    
+    public User register(User user) {
+        // Hash the password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
+    
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }
