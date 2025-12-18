@@ -1,46 +1,65 @@
-package com.example.demo.controller;
+package com.example.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
+import com.example.model.Token;
+import com.example.service.TokenService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-import com.example.demo.service.AuthService;
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.RegisterRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/tokens")
-@Tag(name = "Token Controller")
 public class TokenController {
-
-    private final TokenService tokenService;
-
-    public TokenController(TokenService tokenService) {
-        this.tokenService = tokenService;
-    }
-
+    
+    @Autowired
+    private TokenService tokenService;
+    
     @PostMapping("/issue/{counterId}")
-    @Operation(summary = "Issue new token")
     public ResponseEntity<?> issueToken(@PathVariable Long counterId) {
-        return ResponseEntity.ok(tokenService.issueToken(counterId));
+        try {
+            Token token = tokenService.issueToken(counterId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Token issued successfully");
+            response.put("token", token);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
-
+    
     @PutMapping("/status/{tokenId}")
-    @Operation(summary = "Update token status")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long tokenId,
-            @RequestParam String status) {
-        return ResponseEntity.ok(tokenService.updateStatus(tokenId, status));
+            @RequestBody Map<String, String> statusRequest) {
+        try {
+            String status = statusRequest.get("status");
+            Token updatedToken = tokenService.updateStatus(tokenId, status);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Token status updated successfully");
+            response.put("token", updatedToken);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
-
+    
     @GetMapping("/{tokenId}")
-    @Operation(summary = "Get token details")
     public ResponseEntity<?> getToken(@PathVariable Long tokenId) {
-        return ResponseEntity.ok(tokenService.getToken(tokenId));
+        try {
+            Token token = tokenService.getToken(tokenId)
+                .orElseThrow(() -> new RuntimeException("Token not found"));
+            return ResponseEntity.ok(token);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
     }
 }

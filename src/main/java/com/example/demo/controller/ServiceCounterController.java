@@ -1,38 +1,47 @@
-package com.example.demo.controller;
+package com.example.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
+import com.example.model.ServiceCounter;
+import com.example.service.ServiceCounterService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-import com.example.demo.service.AuthService;
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.RegisterRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/counters")
-@Tag(name = "Service Counter Controller")
 public class ServiceCounterController {
-
-    private final ServiceCounterService counterService;
-
-    public ServiceCounterController(ServiceCounterService counterService) {
-        this.counterService = counterService;
-    }
-
+    
+    @Autowired
+    private ServiceCounterService serviceCounterService;
+    
     @PostMapping
-    @Operation(summary = "Add new service counter")
     public ResponseEntity<?> addCounter(@RequestBody ServiceCounter counter) {
-        return ResponseEntity.ok(counterService.addCounter(counter));
+        try {
+            ServiceCounter savedCounter = serviceCounterService.addCounter(counter);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Counter added successfully");
+            response.put("counter", savedCounter);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
-
+    
     @GetMapping("/active")
-    @Operation(summary = "List active counters")
     public ResponseEntity<?> getActiveCounters() {
-        return ResponseEntity.ok(counterService.getActiveCounters());
+        try {
+            List<ServiceCounter> counters = serviceCounterService.getActiveCounters();
+            return ResponseEntity.ok(counters);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 }

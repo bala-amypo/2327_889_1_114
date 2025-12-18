@@ -1,40 +1,50 @@
-package com.example.demo.controller;
+package com.example.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
+import com.example.model.TokenLog;
+import com.example.service.TokenLogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-import com.example.demo.service.AuthService;
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.RegisterRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/logs")
-@Tag(name = "Token Log Controller")
 public class TokenLogController {
-
-    private final TokenLogService tokenLogService;
-
-    public TokenLogController(TokenLogService tokenLogService) {
-        this.tokenLogService = tokenLogService;
-    }
-
+    
+    @Autowired
+    private TokenLogService tokenLogService;
+    
     @PostMapping("/{tokenId}")
-    @Operation(summary = "Add log for token")
     public ResponseEntity<?> addLog(
             @PathVariable Long tokenId,
-            @RequestParam String message) {
-        return ResponseEntity.ok(tokenLogService.addLog(tokenId, message));
+            @RequestBody Map<String, String> logRequest) {
+        try {
+            String message = logRequest.get("message");
+            TokenLog log = tokenLogService.addLog(tokenId, message);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Log added successfully");
+            response.put("log", log);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
-
+    
     @GetMapping("/{tokenId}")
-    @Operation(summary = "Get logs for token")
     public ResponseEntity<?> getLogs(@PathVariable Long tokenId) {
-        return ResponseEntity.ok(tokenLogService.getLogs(tokenId));
+        try {
+            List<TokenLog> logs = tokenLogService.getLogs(tokenId);
+            return ResponseEntity.ok(logs);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 }
