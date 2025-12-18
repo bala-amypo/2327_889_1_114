@@ -1,12 +1,11 @@
-package com.example.demo.repository;
+package com.example.repository;
 
+import com.example.model.TokenLog;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.example.demo.model.TokenLog;
-
+@Repository
 public interface TokenLogRepository extends JpaRepository<TokenLog, Long> {
-
-    List<TokenLog> findByToken_IdOrderByLoggedAtAsc(Long tokenId);
+    List<TokenLog> findByTokenId(Long tokenId);
 }
