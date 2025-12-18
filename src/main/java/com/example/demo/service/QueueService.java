@@ -1,6 +1,6 @@
 package com.example.tokenmanagement.service;
 
-import com.example.tokenmanagement.model.QueuePosition;
+import com.example.demo.tokenmanagement.model.QueuePosition;
 
 public interface QueueService {
 

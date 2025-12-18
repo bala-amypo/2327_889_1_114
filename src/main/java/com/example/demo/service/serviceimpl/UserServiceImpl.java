@@ -2,10 +2,10 @@ package com.example.tokenmanagement.service.impl;
 
 import org.springframework.stereotype.Service;
 
-import com.example.tokenmanagement.exception.NotFoundException;
-import com.example.tokenmanagement.model.User;
-import com.example.tokenmanagement.repository.UserRepository;
-import com.example.tokenmanagement.service.UserService;
+import com.example.demo.tokenmanagement.exception.NotFoundException;
+import com.example.demo.tokenmanagement.model.User;
+import com.example.demo.tokenmanagement.repository.UserRepository;
+import com.example.demo.tokenmanagement.service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {

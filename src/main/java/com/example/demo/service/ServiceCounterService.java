@@ -2,7 +2,7 @@ package com.example.tokenmanagement.service;
 
 import java.util.List;
 
-import com.example.tokenmanagement.model.ServiceCounter;
+import com.example.demo.tokenmanagement.model.ServiceCounter;
 
 public interface ServiceCounterService {
 

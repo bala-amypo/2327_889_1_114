@@ -4,14 +4,14 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
-import com.example.tokenmanagement.exception.InvalidStatusException;
-import com.example.tokenmanagement.exception.NotActiveException;
-import com.example.tokenmanagement.exception.NotFoundException;
-import com.example.tokenmanagement.model.ServiceCounter;
-import com.example.tokenmanagement.model.Token;
-import com.example.tokenmanagement.repository.ServiceCounterRepository;
-import com.example.tokenmanagement.repository.TokenRepository;
-import com.example.tokenmanagement.service.TokenService;
+import com.example.demo.tokenmanagement.exception.InvalidStatusException;
+import com.example.demo.tokenmanagement.exception.NotActiveException;
+import com.example.demo.tokenmanagement.exception.NotFoundException;
+import com.example.demo.tokenmanagement.model.ServiceCounter;
+import com.example.demo.tokenmanagement.model.Token;
+import com.example.demo.tokenmanagement.repository.ServiceCounterRepository;
+import com.example.demo.tokenmanagement.repository.TokenRepository;
+import com.example.demo.tokenmanagement.service.TokenService;
 
 @Service
 public class TokenServiceImpl implements TokenService {
