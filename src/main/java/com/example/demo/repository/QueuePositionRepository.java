@@ -1,10 +1,10 @@
-package com.example.tokenmanagement.repository;
+package com.example.demo.tokenmanagement.repository;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.tokenmanagement.model.QueuePosition;
+import com.example.demo.tokenmanagement.model.QueuePosition;
 
 public interface QueuePositionRepository extends JpaRepository<QueuePosition, Long> {
 
