@@ -18,12 +18,9 @@ public class TokenLog {
     private Long id;
     
     @ManyToOne
-    @JoinColumn(name = "token_id", nullable = false)
+    @JoinColumn(name = "token_id")
     private Token token;
     
-    @Column(name = "log_message", nullable = false)
     private String logMessage;
-    
-    @Column(name = "logged_at", nullable = false)
     private LocalDateTime loggedAt = LocalDateTime.now();
 }

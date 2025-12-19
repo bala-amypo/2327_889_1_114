@@ -18,12 +18,9 @@ public class QueuePosition {
     private Long id;
     
     @OneToOne
-    @JoinColumn(name = "token_id", nullable = false)
+    @JoinColumn(name = "token_id")
     private Token token;
     
-    @Column(nullable = false)
     private Integer position = 1;
-    
-    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 }

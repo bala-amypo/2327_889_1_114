@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "service_counters")
+@Table(name = "service_counter")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,12 +16,7 @@ public class ServiceCounter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "counter_name", nullable = false)
     private String counterName;
-    
-    @Column(nullable = false)
     private String department;
-    
-    @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 }
