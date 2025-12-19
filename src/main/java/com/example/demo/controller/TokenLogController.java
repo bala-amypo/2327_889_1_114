@@ -1,50 +1,30 @@
-package com.example.controller;
+// src/main/java/com/example/demo/controller/TokenLogController.java
+package com.example.demo.controller;
 
-import com.example.model.TokenLog;
-import com.example.service.TokenLogService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import com.example.demo.entity.TokenLog;
+import com.example.demo.service.TokenLogService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
-@RequestMapping("/logs")
+@RequestMapping("/log")
+@RequiredArgsConstructor
 public class TokenLogController {
-    
-    @Autowired
-    private TokenLogService tokenLogService;
-    
+    private final TokenLogService tokenLogService;
+
     @PostMapping("/{tokenId}")
-    public ResponseEntity<?> addLog(
+    public ResponseEntity<TokenLog> addLog(
             @PathVariable Long tokenId,
-            @RequestBody Map<String, String> logRequest) {
-        try {
-            String message = logRequest.get("message");
-            TokenLog log = tokenLogService.addLog(tokenId, message);
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Log added successfully");
-            response.put("log", log);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
+            @RequestParam String message) {
+        TokenLog log = tokenLogService.addLog(tokenId, message);
+        return ResponseEntity.ok(log);
     }
-    
+
     @GetMapping("/{tokenId}")
-    public ResponseEntity<?> getLogs(@PathVariable Long tokenId) {
-        try {
-            List<TokenLog> logs = tokenLogService.getLogs(tokenId);
-            return ResponseEntity.ok(logs);
-        } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
+    public ResponseEntity<List<TokenLog>> getLogs(@PathVariable Long tokenId) {
+        List<TokenLog> logs = tokenLogService.getLogs(tokenId);
+        return ResponseEntity.ok(logs);
     }
 }

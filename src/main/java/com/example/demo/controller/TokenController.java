@@ -1,65 +1,35 @@
-package com.example.controller;
+// src/main/java/com/example/demo/controller/TokenController.java
+package com.example.demo.controller;
 
-import com.example.model.Token;
-import com.example.service.TokenService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import com.example.demo.entity.Token;
+import com.example.demo.service.TokenService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
-@RequestMapping("/tokens")
+@RequestMapping("/token")
+@RequiredArgsConstructor
 public class TokenController {
-    
-    @Autowired
-    private TokenService tokenService;
-    
+    private final TokenService tokenService;
+
     @PostMapping("/issue/{counterId}")
-    public ResponseEntity<?> issueToken(@PathVariable Long counterId) {
-        try {
-            Token token = tokenService.issueToken(counterId);
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Token issued successfully");
-            response.put("token", token);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
+    public ResponseEntity<Token> issueToken(@PathVariable Long counterId) {
+        Token token = tokenService.issueToken(counterId);
+        return ResponseEntity.ok(token);
     }
-    
+
     @PutMapping("/status/{tokenId}")
-    public ResponseEntity<?> updateStatus(
+    public ResponseEntity<Token> updateStatus(
             @PathVariable Long tokenId,
-            @RequestBody Map<String, String> statusRequest) {
-        try {
-            String status = statusRequest.get("status");
-            Token updatedToken = tokenService.updateStatus(tokenId, status);
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Token status updated successfully");
-            response.put("token", updatedToken);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
+            @RequestParam String status) {
+        Token updatedToken = tokenService.updateStatus(tokenId, status);
+        return ResponseEntity.ok(updatedToken);
     }
-    
+
     @GetMapping("/{tokenId}")
-    public ResponseEntity<?> getToken(@PathVariable Long tokenId) {
-        try {
-            Token token = tokenService.getToken(tokenId)
-                .orElseThrow(() -> new RuntimeException("Token not found"));
-            return ResponseEntity.ok(token);
-        } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        }
+    public ResponseEntity<Token> getToken(@PathVariable Long tokenId) {
+        Token token = tokenService.getToken(tokenId);
+        return ResponseEntity.ok(token);
     }
 }
