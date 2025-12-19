@@ -1,91 +1,69 @@
-package com.example.service.impl;
+package com.example.demo.service.impl;
 
-import com.example.model.Token;
-import com.example.repository.TokenRepository;
-import com.example.repository.ServiceCounterRepository;
-import com.example.service.TokenService;
-import com.example.service.TokenLogService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.entity.BreachAlert;
+import com.example.demo.entity.TokenLog;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.repository.TokenLogRepository;
+import com.example.demo.repository.TokenRepository;
+import com.example.demo.service.TokenService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
-@Transactional
 public class TokenServiceImpl implements TokenService {
-    
-    @Autowired
-    private TokenRepository tokenRepository;
-    
-    @Autowired
-    private ServiceCounterRepository serviceCounterRepository;
-    
-    @Autowired
-    private TokenLogService tokenLogService;
-    
-    @Override
-    public Token issueToken(Long counterId) {
-        // Check if counter is active
-        return serviceCounterRepository.findById(counterId)
-            .filter(counter -> counter.getIsActive())
-            .map(counter -> {
-                Token token = new Token();
-                token.setCounterId(counterId);
-                token.setStatus("ISSUED");
-                token.setCreatedAt(LocalDateTime.now());
-                Token savedToken = tokenRepository.save(token);
-                
-                // Add log entry
-                tokenLogService.addLog(savedToken.getId(), "Token issued for counter: " + counterId);
-                
-                return savedToken;
-            })
-            .orElseThrow(() -> new RuntimeException("Counter not active"));
+
+    private final TokenRepository tokenRepository;
+    private final TokenLogRepository tokenLogRepository;
+
+    public TokenServiceImpl(TokenRepository tokenRepository,
+                            TokenLogRepository tokenLogRepository) {
+        this.tokenRepository = tokenRepository;
+        this.tokenLogRepository = tokenLogRepository;
     }
-    
+
     @Override
-    public Token updateStatus(Long tokenId, String status) {
-        return tokenRepository.findByTokenId(tokenId)
-            .map(token -> {
-                String oldStatus = token.getStatus();
-                
-                // Validate status transition
-                if (!isValidTransition(oldStatus, status)) {
-                    throw new RuntimeException("Invalid status transition from " + oldStatus + " to " + status);
-                }
-                
-                token.setStatus(status);
-                token.setUpdatedAt(LocalDateTime.now());
-                Token updatedToken = tokenRepository.save(token);
-                
-                // Add log entry
-                tokenLogService.addLog(tokenId, "Status changed from " + oldStatus + " to " + status);
-                
-                return updatedToken;
-            })
-            .orElseThrow(() -> new RuntimeException("Token not found"));
+    public BreachAlert getToken(Long tokenId) {
+        return tokenRepository.findById(tokenId)
+                .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
     }
-    
+
     @Override
-    public Optional<Token> getToken(Long tokenId) {
-        return tokenRepository.findByTokenId(tokenId);
-    }
-    
-    private boolean isValidTransition(String currentStatus, String newStatus) {
-        // Valid transitions: ISSUED -> CALLED -> SERVING -> COMPLETED/CANCELLED
-        switch (currentStatus) {
-            case "ISSUED":
-                return "CALLED".equals(newStatus) || "CANCELLED".equals(newStatus);
-            case "CALLED":
-                return "SERVING".equals(newStatus) || "CANCELLED".equals(newStatus);
-            case "SERVING":
-                return "COMPLETED".equals(newStatus) || "CANCELLED".equals(newStatus);
-            case "COMPLETED":
-            case "CANCELLED":
-                return false; // No transitions from terminal states
-            default:
-                return false;
+    public BreachAlert updateStatus(Long tokenId, String status) {
+        BreachAlert token = getToken(tokenId);
+
+        String current = token.getStatus();
+
+        if (!isValidTransition(current, status)) {
+            throw new IllegalArgumentException("Invalid status transition");
         }
+
+        token.setStatus(status);
+
+        if ("RESOLVED".equals(status) || "CANCELLED".equals(status)) {
+            token.setResolvedAt(LocalDateTime.now());
+        } else {
+            token.setResolvedAt(null);
+        }
+
+        BreachAlert saved = tokenRepository.save(token);
+
+        tokenLogRepository.save(
+                new TokenLog(saved, "Status changed to " + status, null)
+        );
+
+        return saved;
+    }
+
+    private boolean isValidTransition(String from, String to) {
+        if ("OPEN".equals(from) &&
+                ("ACKNOWLEDGED".equals(to) || "CANCELLED".equals(to))) {
+            return true;
+        }
+        if ("ACKNOWLEDGED".equals(from) &&
+                ("RESOLVED".equals(to) || "CANCELLED".equals(to))) {
+            return true;
+        }
+        return false;
     }
 }
