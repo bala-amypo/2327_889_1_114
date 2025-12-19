@@ -1,26 +1,35 @@
-// src/main/java/com/example/demo/entity/TokenLog.java
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "token_logs")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class TokenLog {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @ManyToOne
-    @JoinColumn(name = "token_id")
-    private Token token;
-    
+    private BreachAlert token;
+
     private String logMessage;
-    private LocalDateTime loggedAt = LocalDateTime.now();
+
+    private LocalDateTime loggedAt;
+
+    public TokenLog() {}
+
+    public TokenLog(BreachAlert token, String logMessage, LocalDateTime loggedAt) {
+        this.token = token;
+        this.logMessage = logMessage;
+        this.loggedAt = loggedAt;
+    }
+
+    @PrePersist
+    void onCreate() {
+        this.loggedAt = LocalDateTime.now();
+    }
+
+    // getters & setters
 }
