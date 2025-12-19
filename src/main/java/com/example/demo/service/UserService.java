@@ -1,28 +1,34 @@
-package com.example.service;
+// src/main/java/com/example/demo/service/UserService.java
+package com.example.demo.service;
 
-import com.example.model.User;
-import com.example.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.example.demo.entity.User;
+import com.example.demo.exception.DuplicateResourceException;
+import com.example.demo.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    
-    @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-    
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
     public User register(User user) {
-        // Hash the password before saving
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new DuplicateResourceException("Email already exists");
+        }
+        
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRole() == null) {
+            user.setRole("STAFF");
+        }
+        
         return userRepository.save(user);
     }
-    
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElse(null);
     }
 }

@@ -1,22 +1,22 @@
-package com.example.service;
+// src/main/java/com/example/demo/service/ServiceCounterService.java
+package com.example.demo.service;
 
-import com.example.model.ServiceCounter;
-import com.example.repository.ServiceCounterRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.entity.ServiceCounter;
+import com.example.demo.repository.ServiceCounterRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ServiceCounterService {
-    
-    @Autowired
-    private ServiceCounterRepository serviceCounterRepository;
-    
+    private final ServiceCounterRepository serviceCounterRepository;
+
     public ServiceCounter addCounter(ServiceCounter counter) {
         return serviceCounterRepository.save(counter);
     }
-    
+
     public List<ServiceCounter> getActiveCounters() {
-        return serviceCounterRepository.findActiveCounters();
+        return serviceCounterRepository.findByIsActiveTrue();
     }
 }
