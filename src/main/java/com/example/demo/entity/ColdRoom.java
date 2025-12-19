@@ -1,0 +1,33 @@
+package com.example.demo.entity;
+
+import jakarta.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "cold_rooms")
+public class ColdRoom {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String location;
+
+    private Double minAllowed;
+    private Double maxAllowed;
+
+    @OneToMany(mappedBy = "coldRoom")
+    private List<SensorDevice> sensors;
+
+    public ColdRoom() {}
+
+    public ColdRoom(String name, String location, Double minAllowed, Double maxAllowed) {
+        this.name = name;
+        this.location = location;
+        this.minAllowed = minAllowed;
+        this.maxAllowed = maxAllowed;
+    }
+
+    // getters & setters
+}
