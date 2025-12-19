@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "queue_positions")
 public class QueuePosition {
 
     @Id
@@ -12,19 +11,31 @@ public class QueuePosition {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "token_id")
-    private BreachAlert token;
+    private Token token;
 
     private Integer position;
     private LocalDateTime updatedAt;
 
     public QueuePosition() {}
 
-    public QueuePosition(BreachAlert token, Integer position, LocalDateTime updatedAt) {
+    public QueuePosition(Long id, Token token, Integer position, LocalDateTime updatedAt) {
+        this.id = id;
         this.token = token;
         this.position = position;
         this.updatedAt = updatedAt;
     }
 
-    // getters & setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Token getToken() { return token; }
+    public void setToken(Token token) { this.token = token; }
+
+    public Integer getPosition() { return position; }
+    public void setPosition(Integer position) { this.position = position; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
