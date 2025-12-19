@@ -1,35 +1,33 @@
-// src/main/java/com/example/demo/controller/TokenController.java
 package com.example.demo.controller;
 
 import com.example.demo.entity.Token;
 import com.example.demo.service.TokenService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/token")
-@RequiredArgsConstructor
+@RequestMapping("/tokens")
 public class TokenController {
-    private final TokenService tokenService;
+
+    private final TokenService service;
+
+    public TokenController(TokenService service) {
+        this.service = service;
+    }
 
     @PostMapping("/issue/{counterId}")
-    public ResponseEntity<Token> issueToken(@PathVariable Long counterId) {
-        Token token = tokenService.issueToken(counterId);
-        return ResponseEntity.ok(token);
+    public Token issueToken(@PathVariable Long counterId) {
+        return service.issueToken(counterId);
     }
 
     @PutMapping("/status/{tokenId}")
-    public ResponseEntity<Token> updateStatus(
+    public Token updateStatus(
             @PathVariable Long tokenId,
             @RequestParam String status) {
-        Token updatedToken = tokenService.updateStatus(tokenId, status);
-        return ResponseEntity.ok(updatedToken);
+        return service.updateStatus(tokenId, status);
     }
 
     @GetMapping("/{tokenId}")
-    public ResponseEntity<Token> getToken(@PathVariable Long tokenId) {
-        Token token = tokenService.getToken(tokenId);
-        return ResponseEntity.ok(token);
+    public Token getToken(@PathVariable Long tokenId) {
+        return service.getToken(tokenId);
     }
 }

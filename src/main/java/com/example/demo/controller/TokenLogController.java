@@ -1,30 +1,30 @@
-// src/main/java/com/example/demo/controller/TokenLogController.java
 package com.example.demo.controller;
 
 import com.example.demo.entity.TokenLog;
 import com.example.demo.service.TokenLogService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
-@RequestMapping("/log")
-@RequiredArgsConstructor
+@RequestMapping("/token-logs")
 public class TokenLogController {
-    private final TokenLogService tokenLogService;
+
+    private final TokenLogService service;
+
+    public TokenLogController(TokenLogService service) {
+        this.service = service;
+    }
 
     @PostMapping("/{tokenId}")
-    public ResponseEntity<TokenLog> addLog(
+    public TokenLog addLog(
             @PathVariable Long tokenId,
             @RequestParam String message) {
-        TokenLog log = tokenLogService.addLog(tokenId, message);
-        return ResponseEntity.ok(log);
+        return service.addLog(tokenId, message);
     }
 
     @GetMapping("/{tokenId}")
-    public ResponseEntity<List<TokenLog>> getLogs(@PathVariable Long tokenId) {
-        List<TokenLog> logs = tokenLogService.getLogs(tokenId);
-        return ResponseEntity.ok(logs);
+    public List<TokenLog> getLogs(@PathVariable Long tokenId) {
+        return service.getLogs(tokenId);
     }
 }
