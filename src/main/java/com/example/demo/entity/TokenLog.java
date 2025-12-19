@@ -1,68 +1,29 @@
+// src/main/java/com/example/demo/entity/TokenLog.java
 package com.example.demo.entity;
+
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "token_logs")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TokenLog {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(optional = false)
+    
+    @ManyToOne
+    @JoinColumn(name = "token_id", nullable = false)
     private Token token;
-
+    
+    @Column(name = "log_message", nullable = false)
     private String logMessage;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime loggedAt;
-
-    public TokenLog() {
-    }
-
-    public TokenLog(Long id, Token token, String logMessage, LocalDateTime loggedAt) {
-        this.id = id;
-        this.token = token;
-        this.logMessage = logMessage;
-        this.loggedAt = loggedAt;
-    }
-
-    @PrePersist
-    public void prePersist() {
-        if (loggedAt == null) {
-            loggedAt = LocalDateTime.now();
-        }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Token getToken() {
-        return token;
-    }
-
-    public void setToken(Token token) {
-        this.token = token;
-    }
-
-    public String getLogMessage() {
-        return logMessage;
-    }
-
-    public void setLogMessage(String logMessage) {
-        this.logMessage = logMessage;
-    }
-
-    public LocalDateTime getLoggedAt() {
-        return loggedAt;
-    }
-
-    public void setLoggedAt(LocalDateTime loggedAt) {
-        this.loggedAt = loggedAt;
-    }
+    
+    @Column(name = "logged_at", nullable = false)
+    private LocalDateTime loggedAt = LocalDateTime.now();
 }

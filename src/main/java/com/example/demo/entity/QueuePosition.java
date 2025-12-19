@@ -1,62 +1,29 @@
+// src/main/java/com/example/demo/entity/QueuePosition.java
 package com.example.demo.entity;
+
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "queue_positions")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class QueuePosition {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToOne(optional = false)
+    
+    @OneToOne
+    @JoinColumn(name = "token_id", nullable = false)
     private Token token;
-
+    
     @Column(nullable = false)
-    private Integer position;
-
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    public QueuePosition() {
-    }
-
-    public QueuePosition(Long id, Token token, Integer position, LocalDateTime updatedAt) {
-        this.id = id;
-        this.token = token;
-        this.position = position;
-        this.updatedAt = updatedAt;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Token getToken() {
-        return token;
-    }
-
-    public void setToken(Token token) {
-        this.token = token;
-    }
-
-    public Integer getPosition() {
-        return position;
-    }
-
-    public void setPosition(Integer position) {
-        this.position = position;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    private Integer position = 1;
+    
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

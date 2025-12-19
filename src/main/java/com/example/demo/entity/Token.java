@@ -1,91 +1,44 @@
+// src/main/java/com/example/demo/entity/Token.java
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "tokens", uniqueConstraints = {
+    @UniqueConstraint(columnNames = "token_number")
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Token {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, unique = true)
+    
+    @Column(name = "token_number", nullable = false, unique = true)
     private String tokenNumber;
-
-    @ManyToOne(optional = false)
+    
+    @ManyToOne
+    @JoinColumn(name = "service_counter_id")
     private ServiceCounter serviceCounter;
-
+    
     @Column(nullable = false)
-    private String status; // WAITING / SERVING / COMPLETED / CANCELLED
-
-    @Column(nullable = false)
+    private String status = "WAITING"; // WAITING, SERVING, COMPLETED, CANCELLED
+    
+    @Column(name = "issued_at", nullable = false)
     private LocalDateTime issuedAt;
-
+    
+    @Column(name = "completed_at")
     private LocalDateTime completedAt;
-
-    public Token() {
-    }
-
-    public Token(Long id,
-                 String tokenNumber,
-                 ServiceCounter serviceCounter,
-                 String status,
-                 LocalDateTime issuedAt,
-                 LocalDateTime completedAt) {
-        this.id = id;
-        this.tokenNumber = tokenNumber;
-        this.serviceCounter = serviceCounter;
-        this.status = status;
-        this.issuedAt = issuedAt;
-        this.completedAt = completedAt;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTokenNumber() {
-        return tokenNumber;
-    }
-
-    public void setTokenNumber(String tokenNumber) {
-        this.tokenNumber = tokenNumber;
-    }
-
-    public ServiceCounter getServiceCounter() {
-        return serviceCounter;
-    }
-
-    public void setServiceCounter(ServiceCounter serviceCounter) {
-        this.serviceCounter = serviceCounter;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getIssuedAt() {
-        return issuedAt;
-    }
-
-    public void setIssuedAt(LocalDateTime issuedAt) {
-        this.issuedAt = issuedAt;
-    }
-
-    public LocalDateTime getCompletedAt() {
-        return completedAt;
-    }
-
-    public void setCompletedAt(LocalDateTime completedAt) {
-        this.completedAt = completedAt;
+    
+    @PreUpdate
+    public void preUpdate() {
+        if ("COMPLETED".equals(status) && completedAt == null) {
+            completedAt = LocalDateTime.now();
+        }
     }
 }
