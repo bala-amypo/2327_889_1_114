@@ -1,10 +1,32 @@
-package com.example.demo.service;
+package com.example.service.impl;
 
+import com.example.model.QueuePosition;
+import com.example.repository.QueuePositionRepository;
+import com.example.service.QueueService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
-import com.example.demo.entity.QueuePosition;
-
-
-public interface QueueService {
-QueuePosition updateQueuePosition(Long tokenId, Integer newPosition);
-QueuePosition getPosition(Long tokenId);
+@Service
+@Transactional
+public class QueueServiceImpl implements QueueService {
+    
+    @Autowired
+    private QueuePositionRepository queuePositionRepository;
+    
+    @Override
+    public QueuePosition updateQueuePosition(Long tokenId, Integer newPosition) {
+        QueuePosition queuePosition = new QueuePosition();
+        queuePosition.setTokenId(tokenId);
+        queuePosition.setPosition(newPosition);
+        queuePosition.setUpdatedAt(LocalDateTime.now());
+        return queuePositionRepository.save(queuePosition);
+    }
+    
+    @Override
+    public Optional<QueuePosition> getPosition(Long tokenId) {
+        return queuePositionRepository.findById(tokenId);
+    }
 }
