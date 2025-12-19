@@ -1,16 +1,10 @@
-package com.example.demo.service;
+// src/main/java/com/example/demo/dto/AuthRequest.java
+package com.example.demo.dto;
 
-import org.springframework.stereotype.Service;
+import lombok.Data;
 
-@Service
-public class AuthService {
-    public String register(String username, String password, String email) {
-        // Implementation
-        return "User registered";
-    }
-    
-    public String login(String username, String password) {
-        // Implementation
-        return "Login successful";
-    }
+@Data
+public class AuthRequest {
+    private String email;
+    private String password;
 }
