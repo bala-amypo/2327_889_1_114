@@ -1,32 +1,42 @@
-package com.example.service.impl;
+package com.example.demo.service.impl;
 
-import com.example.model.TokenLog;
-import com.example.repository.TokenLogRepository;
-import com.example.service.TokenLogService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.entity.BreachAlert;
+import com.example.demo.entity.TokenLog;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.repository.TokenLogRepository;
+import com.example.demo.repository.TokenRepository;
+import com.example.demo.service.TokenLogService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@Transactional
 public class TokenLogServiceImpl implements TokenLogService {
-    
-    @Autowired
-    private TokenLogRepository tokenLogRepository;
-    
+
+    private final TokenLogRepository tokenLogRepository;
+    private final TokenRepository tokenRepository;
+
+    public TokenLogServiceImpl(TokenLogRepository tokenLogRepository,
+                               TokenRepository tokenRepository) {
+        this.tokenLogRepository = tokenLogRepository;
+        this.tokenRepository = tokenRepository;
+    }
+
     @Override
     public TokenLog addLog(Long tokenId, String message) {
-        TokenLog log = new TokenLog();
-        log.setTokenId(tokenId);
-        log.setMessage(message);
-        log.setTimestamp(LocalDateTime.now());
+        BreachAlert token = tokenRepository.findById(tokenId)
+                .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
+
+        TokenLog log = new TokenLog(token, message, LocalDateTime.now());
         return tokenLogRepository.save(log);
     }
-    
+
     @Override
     public List<TokenLog> getLogs(Long tokenId) {
-        return tokenLogRepository.findByTokenId(tokenId);
+        tokenRepository.findById(tokenId)
+                .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
+
+        return tokenLogRepository.findByTokenIdOrderByLoggedAtAsc(tokenId);
     }
 }
