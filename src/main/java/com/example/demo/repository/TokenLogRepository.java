@@ -1,9 +1,12 @@
 package com.example.demo.repository;
 
-import com.example.demo.entity.User;
+import com.example.demo.entity.TokenLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import java.util.List;
+
 public interface TokenLogRepository extends JpaRepository<TokenLog, Long> {
-    List<TokenLog> findByTokenIdOrderByLoggedAtAsc(Long tokenId);
+
+    List<TokenLog> findByToken_IdOrderByLoggedAtAsc(Long tokenId);
+
 }
