@@ -1,35 +1,40 @@
-package com.example.service.impl;
+// src/main/java/com/example/demo/service/UserService.java
+package com.example.demo.service;
 
-import com.example.model.User;
-import com.example.repository.UserRepository;
-import com.example.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.example.demo.entity.User;
+import com.example.demo.exception.DuplicateResourceException;
+import com.example.demo.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional;
 
 @Service
-@Transactional
-public class UserServiceImpl implements UserService {
-    
-    @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-    
-    @Override
+@RequiredArgsConstructor
+public class UserService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
     public User register(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("User with this email already exists");
+        // Check if email already exists
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new DuplicateResourceException("Email already registered");
         }
+        
+        // Encode password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        // Set default role if not provided
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole("STAFF");
+        }
+        
         return userRepository.save(user);
     }
-    
-    @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElse(null);
     }
 }
