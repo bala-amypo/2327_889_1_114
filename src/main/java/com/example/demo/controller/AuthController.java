@@ -1,38 +1,44 @@
+// src/main/java/com/example/demo/controller/AuthController.java
 package com.example.demo.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
+import com.example.demo.dto.AuthRequest;
+import com.example.demo.dto.AuthResponse;
+import com.example.demo.entity.User;
+import com.example.demo.service.JwtService;
+import com.example.demo.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-import com.example.demo.service.AuthService;
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.RegisterRequest;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Auth Controller")
+@RequiredArgsConstructor
 public class AuthController {
-
-    private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final UserService userService;
 
     @PostMapping("/register")
-    @Operation(summary = "Register new user")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+    public ResponseEntity<User> register(@RequestBody User user) {
+        User registeredUser = userService.register(user);
+        return ResponseEntity.ok(registeredUser);
     }
 
     @PostMapping("/login")
-    @Operation(summary = "User login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authRequest.getEmail(),
+                        authRequest.getPassword()
+                )
+        );
+        
+        User user = userService.findByEmail(authRequest.getEmail());
+        String token = jwtService.generateToken(user.getEmail(), user.getRole());
+        
+        return ResponseEntity.ok(new AuthResponse(token, user.getRole(), user.getEmail()));
     }
 }
