@@ -16,8 +16,7 @@ public class Token {
     @ManyToOne
     private ServiceCounter serviceCounter;
 
-    private String status; // WAITING / SERVING / COMPLETED / CANCELLED
-
+    private String status; 
     private LocalDateTime issuedAt;
     private LocalDateTime completedAt;
 

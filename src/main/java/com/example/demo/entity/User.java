@@ -22,7 +22,7 @@ public class User {
 
     private String role = "STAFF";
 
-    // ✅ No-arg constructor
+    
     public User() {}
 
     // ✅ Parameterized constructor

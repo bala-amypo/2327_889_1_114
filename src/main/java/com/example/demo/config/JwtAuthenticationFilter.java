@@ -1,4 +1,3 @@
-// src/main/java/com/example/demo/config/JwtAuthenticationFilter.java
 package com.example.demo.config;
 
 import com.example.demo.service.JwtService;

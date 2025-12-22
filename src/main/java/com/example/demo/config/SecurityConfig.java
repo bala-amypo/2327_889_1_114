@@ -1,4 +1,3 @@
-// src/main/java/com/example/demo/config/SecurityConfig.java
 package com.example.demo.config;
 
 import com.example.demo.service.JwtService;
