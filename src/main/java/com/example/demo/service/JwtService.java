@@ -10,12 +10,12 @@ public class JwtService {
         return "dummy@email.com"; // dummy for now
     }
 
-    // Existing method
+    
     public boolean validateToken(String token) {
         return true;
     }
 
-    // ✅ ADD THIS METHOD (IMPORTANT)
+   
     public boolean validateToken(String token, UserDetails userDetails) {
         return true;
     }

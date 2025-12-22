@@ -25,7 +25,7 @@ public class User {
     
     public User() {}
 
-    // ✅ Parameterized constructor
+    
     public User(Long id, String name, String email, String password, String role) {
         this.id = id;
         this.name = name;
@@ -34,7 +34,7 @@ public class User {
         this.role = role;
     }
 
-    // ✅ Getters & Setters
+   
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
