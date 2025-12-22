@@ -1,12 +1,11 @@
 package com.example.demo.repository;
 
-import com.example.demo.entity.ServiceCounter;
+import com.example.demo.entity.SensorDevice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface ServiceCounterRepository extends JpaRepository<ServiceCounter, Long> {
+public interface SensorDeviceRepository extends JpaRepository<SensorDevice, Long> {
 
-    List<ServiceCounter> findByIsActiveTrue();
-
+    Optional<SensorDevice> findByIdentifier(String identifier);
 }
