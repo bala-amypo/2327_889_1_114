@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @Tag(name = "Auth")
-public class AuthCounterController {
+public class AuthController {
 
     private final UserService service;
 
