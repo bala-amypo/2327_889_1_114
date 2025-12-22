@@ -1,16 +1,25 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.SensorDevice;
+import com.example.demo.entity.ServiceCounter;
+import com.example.demo.repository.ServiceCounterRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public interface SensorService {
+@Service
+public class ServiceCounterService {
 
-    SensorDevice addSensor(SensorDevice sensor);
+    private final ServiceCounterRepository repo;
 
-    SensorDevice updateStatus(Long id, Boolean isActive);
+    public ServiceCounterService(ServiceCounterRepository repo) {
+        this.repo = repo;
+    }
 
-    List<SensorDevice> getAllSensors();
+    public ServiceCounter addCounter(ServiceCounter c) {
+        return repo.save(c);
+    }
 
-    SensorDevice getByIdentifier(String identifier);
+    public List<ServiceCounter> getActiveCounters() {
+        return repo.findByIsActiveTrue();
+    }
 }

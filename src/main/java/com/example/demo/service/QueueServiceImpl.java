@@ -1,22 +1,24 @@
-package com.example.demo.service;
+package com.example.demo.service.impl;
 
-import org.springframework.security.core.userdetails.UserDetails;
+import com.example.demo.entity.QueuePosition;
+import com.example.demo.repository.QueuePositionRepository;
+import com.example.demo.service.QueueService;
+
 import org.springframework.stereotype.Service;
 
-@Service
-public class JwtService {
+import java.util.List;
 
-    public String extractUsername(String token) {
-        return "dummy@email.com"; // dummy for now
+@Service   // 🔥 THIS IS THE KEY
+public class QueueServiceImpl implements QueueService {
+
+    private final QueuePositionRepository queueRepo;
+
+    public QueueServiceImpl(QueuePositionRepository queueRepo) {
+        this.queueRepo = queueRepo;
     }
 
-    
-    public boolean validateToken(String token) {
-        return true;
-    }
-
-   
-    public boolean validateToken(String token, UserDetails userDetails) {
-        return true;
+    @Override
+    public List<QueuePosition> getQueue() {
+        return queueRepo.findAll();
     }
 }
