@@ -55,7 +55,8 @@ public class JwtTokenProvider {
             .getBody()
             .getSubject();
 }
-
+@Value("${jwt.secret}")
+private String jwtSecret;
 
     public Claims getClaims(String token) {
         return Jwts.parser()
