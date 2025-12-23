@@ -13,27 +13,3 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 }
 
-// ColdRoomRepository.java
-@Repository
-interface ColdRoomRepository extends JpaRepository<ColdRoom, Long> {
-    Optional<ColdRoom> findByName(String name);
-    List<ColdRoom> findByLocation(String location);
-}
-
-// SensorDeviceRepository.java
-@Repository
-interface SensorDeviceRepository extends JpaRepository<SensorDevice, Long> {
-    Optional<SensorDevice> findByIdentifier(String identifier);
-    boolean existsByIdentifier(String identifier);
-    List<SensorDevice> findByColdRoomId(Long coldRoomId);
-    List<SensorDevice> findByIsActiveTrue();
-}
-
-// TemperatureReadingRepository.java
-@Repository
-interface TemperatureReadingRepository extends JpaRepository<TemperatureReading, Long> {
-    List<TemperatureReading> findByColdRoomIdOrderByRecordedAtDesc(Long coldRoomId);
-    List<TemperatureReading> findBySensorIdOrderByRecordedAtDesc(Long sensorId);
-}
- Optional<ServiceCounter> findByName(String name);
-}
