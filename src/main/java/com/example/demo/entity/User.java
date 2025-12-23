@@ -45,7 +45,22 @@ public void setRole(String role) {
 public void setEmail(String email) {
     this.email = email;
 }
+// Add parameterized constructor
+public User(String username, String password, String email, String role) {
+    this.username = username;
+    this.password = password;
+    this.email = email;
+    this.role = role;
+}
 
+// Add getId method if missing
+public Long getId() {
+    return id;
+}
+
+public void setId(Long id) {
+    this.id = id;
+}
 
    
 }
