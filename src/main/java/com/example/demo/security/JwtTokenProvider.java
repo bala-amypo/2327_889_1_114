@@ -38,7 +38,7 @@ public class JwtTokenProvider {
     
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
+           Jwts.parser()
                     .setSigningKey(secretKey)
                     .build()
                     .parseClaimsJws(token);
@@ -47,9 +47,28 @@ public class JwtTokenProvider {
             return false;
         }
     }
-    
+    public String getUsernameFromToken(String token) {
+    return Jwts.parser()
+            .setSigningKey(jwtSecret)
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject();
+}
+
+public boolean validateToken(String token) {
+    try {
+        Jwts.parser()
+            .setSigningKey(jwtSecret)
+            .build()
+            .parseClaimsJws(token);
+        return true;
+    } catch (Exception e) {
+        return false;
+    }
+}
     public Claims getClaims(String token) {
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
