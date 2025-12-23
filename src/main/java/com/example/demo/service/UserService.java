@@ -1,25 +1,13 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.User;
-import com.example.demo.repository.UserRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-@Service
-public class UserService {
-
-    private final UserRepository repo;
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
-    public UserService(UserRepository repo) {
-        this.repo = repo;
-    }
-
-    public User register(User user) {
-        if (repo.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
-        }
-        user.setPassword(encoder.encode(user.getPassword()));
-        return repo.save(user);
-    }
+public interface UserService {
+    User registerUser(User user);
+    User findByEmail(String email);
+    User findById(Long id);
+    List<User> getAllUsers();
+    User updateUser(Long id, User user);
+    void deleteUser(Long id);
 }
