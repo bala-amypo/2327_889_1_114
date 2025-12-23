@@ -28,7 +28,7 @@ public class ServiceCounterController {
     @PostMapping
     @Operation(summary = "Add a new service counter")
     public ResponseEntity<ServiceCounterResponse> addCounter(@RequestBody ServiceCounter counter) {
-        ServiceCounter created = counterService.addCounter(counter);
+        ServiceCounter created = counterService.createCounter(counter);
         return new ResponseEntity<>(toResponse(created), HttpStatus.CREATED);
     }
     
