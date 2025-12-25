@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class QueuePosition {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
     @OneToOne
@@ -26,5 +26,4 @@ public class QueuePosition {
     public void setPosition(Integer position) { this.position = position; }
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

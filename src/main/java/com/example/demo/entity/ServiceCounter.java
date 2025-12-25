@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 public class ServiceCounter {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
     private String counterName;
@@ -23,5 +23,5 @@ public class ServiceCounter {
     public void setDepartment(String department) { this.department = department; }
 
     public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+    public void setIsActive(Boolean active) { isActive = active; }
 }

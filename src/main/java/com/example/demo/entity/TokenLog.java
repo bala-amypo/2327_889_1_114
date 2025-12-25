@@ -7,13 +7,13 @@ import java.time.LocalDateTime;
 public class TokenLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
     @ManyToOne
     private Token token;
 
-    private String message;
+    private String logMessage;
     private LocalDateTime loggedAt = LocalDateTime.now();
 
     public Long getId() { return id; }
@@ -22,9 +22,8 @@ public class TokenLog {
     public Token getToken() { return token; }
     public void setToken(Token token) { this.token = token; }
 
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
+    public String getLogMessage() { return logMessage; }
+    public void setLogMessage(String logMessage) { this.logMessage = logMessage; }
 
     public LocalDateTime getLoggedAt() { return loggedAt; }
-    public void setLoggedAt(LocalDateTime loggedAt) { this.loggedAt = loggedAt; }
 }
