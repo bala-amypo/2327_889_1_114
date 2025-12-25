@@ -1,11 +1,9 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.*;
+import com.example.demo.entity.TokenLog;
 import java.util.List;
 
-// TokenLogService.java
-interface TokenLogService {
-    TokenLog addLog(Long tokenId, String message);
+public interface TokenLogService {
+    TokenLog addLog(Long tokenId, String msg);
     List<TokenLog> getLogs(Long tokenId);
-    List<TokenLog> getLogsByTokenNumber(String tokenNumber);
 }

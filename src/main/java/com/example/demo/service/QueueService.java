@@ -1,14 +1,8 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.*;
-import java.util.List;
+import com.example.demo.entity.QueuePosition;
 
-
-
-// QueueService.java
-interface QueueService {
-    QueuePosition updateQueuePosition(Long tokenId, Integer newPosition);
+public interface QueueService {
+    QueuePosition updateQueuePosition(Long tokenId, Integer pos);
     QueuePosition getPosition(Long tokenId);
-    QueuePosition getPositionByTokenNumber(String tokenNumber);
 }
-

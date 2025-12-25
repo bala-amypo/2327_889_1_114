@@ -1,15 +1,9 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.*;
-import java.util.List;
+import com.example.demo.entity.Token;
 
-
-// TokenService.java
-interface TokenService {
-    BreachAlert issueToken(Long counterId);
-    BreachAlert createBreachAlert(TemperatureReading reading, String breachType);
-    BreachAlert updateStatus(Long tokenId, String status);
-    BreachAlert getToken(Long tokenId);
-    BreachAlert getTokenByNumber(String tokenNumber);
-    List<BreachAlert> getTokensByStatus(String status);
+public interface TokenService {
+    Token issueToken(Long counterId);
+    Token updateStatus(Long tokenId, String newStatus);
+    Token getToken(Long id);
 }
