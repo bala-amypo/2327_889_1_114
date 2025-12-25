@@ -1,37 +1,40 @@
 package com.example.demo.config;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-
-import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JwtTokenProvider {
 
-    private final Key key;
-    private final long validity;
+    private final String secretKey;
+    private final long validityInMs;
 
-    public JwtTokenProvider(String secret, long validity) {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
-        this.validity = validity;
+    public JwtTokenProvider(String secretKey, long validityInMs) {
+        this.secretKey = secretKey;
+        this.validityInMs = validityInMs;
     }
 
     public String generateToken(Long userId, String email, String role) {
-        Claims claims = Jwts.claims().setSubject(userId.toString());
+
+        Map<String, Object> claims = new HashMap<>();
         claims.put("email", email);
         claims.put("role", role);
 
         return Jwts.builder()
                 .setClaims(claims)
+                .setSubject(String.valueOf(userId))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + validity))
-                .signWith(key)
+                .setExpiration(new Date(System.currentTimeMillis() + validityInMs))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
@@ -39,8 +42,8 @@ public class JwtTokenProvider {
     }
 
     public Claims getClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(key)
-                .build()
+        return Jwts.parser()
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
     }
