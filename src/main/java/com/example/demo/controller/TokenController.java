@@ -1,27 +1,23 @@
-
 package com.example.demo.controller;
 
-import com.example.demo.entity.Token;
-import com.example.demo.service.TokenService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/token")
+@RequestMapping("/tokens")
 public class TokenController {
 
-    @Autowired
-    private TokenService tokenService;
-
-    @PostMapping("/create")
-    public Token createToken(@RequestBody Token token) {
-        return tokenService.createToken(token);
+    @PostMapping("/issue/{counterId}")
+    public String issue() {
+        return "ok";
     }
 
-    @GetMapping("/all")
-    public List<Token> getAllTokens() {
-        return tokenService.getAllTokens();
+    @PutMapping("/status/{tokenId}")
+    public String update() {
+        return "ok";
+    }
+
+    @GetMapping("/{tokenId}")
+    public String get() {
+        return "ok";
     }
 }

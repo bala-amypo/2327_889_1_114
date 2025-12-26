@@ -1,31 +1,38 @@
+package com.example.demo.config;
 
-package com.example.demo.security;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import java.util.*;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.stereotype.Component;
-
-import java.util.Date;
-
-@Component
 public class JwtTokenProvider {
 
-    // Hardcoded secret since we can't use application.properties
-    private final String JWT_SECRET = "mySecretKey123456"; 
+    private final byte[] secret;
+    private final long expiry;
 
-    // Token validity: 1 hour
-    private final long JWT_EXPIRATION = 3600000;
+    public JwtTokenProvider(String secret, long expiry) {
+        this.secret = secret.getBytes();
+        this.expiry = expiry;
+    }
 
-    // Generate token using username
-    public String generateToken(String username) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
-
+    public String generateToken(Long userId, String email, String role) {
         return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                .setSubject(String.valueOf(userId))
+                .claim("email", email)
+                .claim("role", role)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiry))
+                .signWith(Keys.hmacShaKeyFor(secret))
                 .compact();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token);
+            return true;
+        } catch (Exception e) { return false; }
+    }
+
+    public Claims getClaims(String token) {
+        return Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token).getBody();
     }
 }

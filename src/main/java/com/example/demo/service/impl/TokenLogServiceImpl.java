@@ -1,31 +1,28 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.entity.Token;
-import com.example.demo.entity.TokenLog;
-import com.example.demo.repository.TokenLogRepository;
-import com.example.demo.repository.TokenRepository;
-
+import com.example.demo.entity.*;
+import com.example.demo.repository.*;
 import java.util.List;
 
 public class TokenLogServiceImpl {
 
-    private final TokenLogRepository repo;
+    private final TokenLogRepository logRepo;
     private final TokenRepository tokenRepo;
 
-    public TokenLogServiceImpl(TokenLogRepository r, TokenRepository t) {
-        this.repo = r;
+    public TokenLogServiceImpl(TokenLogRepository l, TokenRepository t) {
+        this.logRepo = l;
         this.tokenRepo = t;
     }
 
     public TokenLog addLog(Long tokenId, String msg) {
         Token t = tokenRepo.findById(tokenId).orElseThrow();
-        TokenLog log = new TokenLog();
-        log.setToken(t);
-        log.setLogMessage(msg);
-        return repo.save(log);
+        TokenLog l = new TokenLog();
+        l.setToken(t);
+        l.setLogMessage(msg);
+        return logRepo.save(l);
     }
 
     public List<TokenLog> getLogs(Long tokenId) {
-        return repo.findByToken_IdOrderByLoggedAtAsc(tokenId);
+        return logRepo.findByToken_IdOrderByLoggedAtAsc(tokenId);
     }
 }

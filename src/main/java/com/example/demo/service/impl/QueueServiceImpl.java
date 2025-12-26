@@ -1,44 +1,29 @@
-
 package com.example.demo.service.impl;
 
-import com.example.demo.entity.QueuePosition;
-import com.example.demo.repository.QueuePositionRepository;
-import com.example.demo.service.QueueService;
-import org.springframework.stereotype.Service;
+import com.example.demo.entity.*;
+import com.example.demo.repository.*;
 
-@Service
-public class QueueServiceImpl implements QueueService {
+public class QueueServiceImpl {
 
-    private final QueuePositionRepository queueRepository;
+    private final QueuePositionRepository queueRepo;
+    private final TokenRepository tokenRepo;
 
-    public QueueServiceImpl(QueuePositionRepository queueRepository) {
-        this.queueRepository = queueRepository;
+    public QueueServiceImpl(QueuePositionRepository q, TokenRepository t) {
+        this.queueRepo = q;
+        this.tokenRepo = t;
     }
 
-    // Must return Integer (as defined in QueueService)
-    @Override
-    public Integer getPosition(Long id) {
-        QueuePosition qp = queueRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Queue not found"));
+    public QueuePosition updateQueuePosition(Long tokenId, Integer pos) {
+        if (pos < 1) throw new IllegalArgumentException(">= 1");
 
-        return qp.getPosition();   // returning INTEGER, not QueuePosition
+        Token t = tokenRepo.findById(tokenId).orElseThrow(() -> new RuntimeException("not found"));
+        QueuePosition q = new QueuePosition();
+        q.setToken(t);
+        q.setPosition(pos);
+        return queueRepo.save(q);
     }
 
-    @Override
-    public void updateQueuePosition(Long id, Integer newPosition) {
-        QueuePosition qp = queueRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Queue not found"));
-
-        qp.setPosition(newPosition);
-        queueRepository.save(qp);
-    }
-
-    // These are extra helper methods (not in interface)
-    public QueuePosition addToQueue(QueuePosition queue) {
-        return queueRepository.save(queue);
-    }
-
-    public void removeFromQueue(Long id) {
-        queueRepository.deleteById(id);
+    public QueuePosition getPosition(Long tokenId) {
+        return queueRepo.findByToken_Id(tokenId).orElse(null);
     }
 }
