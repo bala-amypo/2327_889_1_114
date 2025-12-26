@@ -25,3 +25,11 @@ public class ServiceCounter {
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean active) { isActive = active; }
 }
+package com.example.demo.entity;
+
+public enum ServiceCounter {
+    COUNTER_1,
+    COUNTER_2,
+    COUNTER_3
+}
+
