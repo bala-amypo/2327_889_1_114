@@ -31,6 +31,14 @@ public class ServiceCounterServiceImpl implements ServiceCounterService {
     @Override
     public ServiceCounter getById(Long id) {
         Optional<ServiceCounter> optional = repository.findById(id);
-        return optional.orElse(null); // or throw custom exception
+        return optional.orElse(null); // or throw exception
+    }
+
+    @Override
+    public List<ServiceCounter> getActiveCounters() {
+        // implement logic for active counters
+        return repository.findAll().stream()
+                .filter(ServiceCounter::isActive) // assuming entity has isActive()
+                .toList();
     }
 }

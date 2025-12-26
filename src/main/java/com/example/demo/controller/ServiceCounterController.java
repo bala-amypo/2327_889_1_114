@@ -31,4 +31,9 @@ public class ServiceCounterController {
     public ServiceCounter getCounterById(@PathVariable Long id) {
         return serviceCounterService.getById(id);
     }
+
+    @GetMapping("/active")
+    public List<ServiceCounter> getActiveCounters() {
+        return serviceCounterService.getActiveCounters();
+    }
 }
