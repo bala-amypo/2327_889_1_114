@@ -1,10 +1,21 @@
+// package com.example.demo.repository;
+
+// import com.example.demo.entity.*;
+// import org.springframework.data.jpa.repository.JpaRepository;
+
+// import java.util.List;
+// import java.util.Optional;
+
+// public interface UserRepository extends JpaRepository<User, Long> {
+//     Optional<User> findByEmail(String email);
+// }
 package com.example.demo.repository;
 
-import com.example.demo.entity.User;
+import com.example.demo.entity.Token;
+import com.example.demo.entity.TokenStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
-    boolean existsByEmail(String email);
+public interface TokenRepository extends JpaRepository<Token, Long> {
+
+    Token findFirstByServiceCounter_IdAndStatusOrderByIssuedAtAsc(Long counterId, TokenStatus status);
 }

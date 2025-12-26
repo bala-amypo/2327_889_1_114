@@ -1,3 +1,42 @@
+// package com.example.demo.entity;
+
+// import jakarta.persistence.*;
+// import java.time.LocalDateTime;
+
+// @Entity
+// public class Token {
+
+//     @Id
+//     @GeneratedValue
+//     private Long id;
+
+//     @Column(unique = true)
+//     private String tokenNumber;
+
+//     @ManyToOne
+//     private ServiceCounter serviceCounter;
+
+//     private String status;
+//     private LocalDateTime issuedAt = LocalDateTime.now();
+//     private LocalDateTime completedAt;
+
+//     public Long getId() { return id; }
+//     public void setId(Long id) { this.id = id; }
+
+//     public String getTokenNumber() { return tokenNumber; }
+//     public void setTokenNumber(String tokenNumber) { this.tokenNumber = tokenNumber; }
+
+//     public ServiceCounter getServiceCounter() { return serviceCounter; }
+//     public void setServiceCounter(ServiceCounter serviceCounter) { this.serviceCounter = serviceCounter; }
+
+//     public String getStatus() { return status; }
+//     public void setStatus(String status) { this.status = status; }
+
+//     public LocalDateTime getIssuedAt() { return issuedAt; }
+
+//     public LocalDateTime getCompletedAt() { return completedAt; }
+//     public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
+// }
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
@@ -7,23 +46,54 @@ import java.time.LocalDateTime;
 public class Token {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int number;
+    private String tokenNumber;
 
     @Enumerated(EnumType.STRING)
     private TokenStatus status;
 
-    private LocalDateTime completedAt;
+    private LocalDateTime issuedAt;
 
-    public Long getId() { return id; }
-    public int getNumber() { return number; }
-    public TokenStatus getStatus() { return status; }
-    public LocalDateTime getCompletedAt() { return completedAt; }
+    @ManyToOne
+    private ServiceCounter serviceCounter;
 
-    public void setId(Long id) { this.id = id; }
-    public void setNumber(int number) { this.number = number; }
-    public void setStatus(TokenStatus status) { this.status = status; }
-    public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
+    // ---------------- GETTERS & SETTERS ----------------
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getTokenNumber() {
+        return tokenNumber;
+    }
+
+    public void setTokenNumber(String tokenNumber) {
+        this.tokenNumber = tokenNumber;
+    }
+
+    public TokenStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TokenStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getIssuedAt() {
+        return issuedAt;
+    }
+
+    public void setIssuedAt(LocalDateTime issuedAt) {
+        this.issuedAt = issuedAt;
+    }
+
+    public ServiceCounter getServiceCounter() {
+        return serviceCounter;
+    }
+
+    public void setServiceCounter(ServiceCounter serviceCounter) {
+        this.serviceCounter = serviceCounter;
+    }
 }
