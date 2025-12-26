@@ -46,7 +46,6 @@ import com.example.demo.config.JwtTokenProvider;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -59,21 +58,17 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
-        User savedUser = userService.register(user);
+    @PostMapping("/login")
+    public String login(@RequestBody User user) {
+        User savedUser = userService.login(user.getEmail(), user.getPassword());
         String token = jwtTokenProvider.generateToken(savedUser);
-        return ResponseEntity.ok(token);
+        return token;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
-        User savedUser = userService.findByEmail(user.getEmail());
-        if (savedUser != null && savedUser.getPassword().equals(user.getPassword())) {
-            String token = jwtTokenProvider.generateToken(savedUser);
-            return ResponseEntity.ok(token);
-        } else {
-            return ResponseEntity.badRequest().body("Invalid credentials");
-        }
+    @PostMapping("/register")
+    public String register(@RequestBody User user) {
+        User savedUser = userService.register(user);
+        String token = jwtTokenProvider.generateToken(savedUser);
+        return token;
     }
 }

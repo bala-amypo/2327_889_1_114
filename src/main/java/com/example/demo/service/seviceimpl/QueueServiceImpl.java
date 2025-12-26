@@ -33,20 +33,35 @@
 // }
 package com.example.demo.service.impl;
 
+import com.example.demo.entity.QueuePosition;
+import com.example.demo.repository.QueueRepository;
 import com.example.demo.service.QueueService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class QueueServiceImpl implements QueueService {
 
+    @Autowired
+    private QueueRepository queueRepository;
+
+    // Update position of a queue entry
     @Override
-    public Integer getPosition(Long tokenId) {
-        // implement your logic
-        return 1;
+    public void updateQueuePosition(Long id, Integer position) {
+        Optional<QueuePosition> queueOpt = queueRepository.findById(id);
+        if (queueOpt.isPresent()) {
+            QueuePosition queue = queueOpt.get();
+            queue.setPosition(position);
+            queueRepository.save(queue);
+        }
     }
 
+    // Get position of a queue entry
     @Override
-    public void updateQueuePosition(Long tokenId, Integer newPosition) {
-        // implement your logic
+    public Integer getPosition(Long id) {
+        Optional<QueuePosition> queueOpt = queueRepository.findById(id);
+        return queueOpt.map(QueuePosition::getPosition).orElse(null);
     }
 }

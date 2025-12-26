@@ -51,34 +51,37 @@
 package com.example.demo.config;
 
 import com.example.demo.entity.User;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
+
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProvider {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final long validityInMs = 3600000; // 1h
+    private final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    public String createToken(User user) {
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + validityInMs);
-
+    // Generate JWT token
+    public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
-                .setIssuedAt(now)
-                .setExpiration(expiry)
-                .signWith(key)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String getEmail(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build()
+    // Get email (subject) from JWT token
+    public String getEmailFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
                 .parseClaimsJws(token)
-                .getBody().getSubject();
+                .getBody()
+                .getSubject();
     }
 }
 
