@@ -30,9 +30,8 @@ package com.example.demo.service.impl;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -47,13 +46,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public User register(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
-        user.setRole("USER");
         return userRepository.save(user);
     }
 
     @Override
-    public User findByEmail(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        return user.orElse(null);
+    public User login(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!encoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        return user;
     }
 }
