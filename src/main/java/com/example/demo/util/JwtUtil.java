@@ -5,8 +5,7 @@ import java.util.Date;
 
 public class JwtUtil {
 
-    private static final String SECRET =
-            "ChangeThisSecretKeyReplaceMe1234567890";
+    private static final String SECRET = "ChangeThisSecretKeyReplaceMe1234567890";
 
     public static String generateToken(String subject) {
         return Jwts.builder()
