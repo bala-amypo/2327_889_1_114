@@ -10,3 +10,9 @@
 //     Optional<Token> findByTokenNumber(String tokenNumber);
 //     List<Token> findByServiceCounter_IdAndStatusOrderByIssuedAtAsc(Long counterId, String status);
 // }
+package com.example.demo.repository;
+
+import com.example.demo.entity.Token;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TokenRepository extends JpaRepository<Token, Long> {}
