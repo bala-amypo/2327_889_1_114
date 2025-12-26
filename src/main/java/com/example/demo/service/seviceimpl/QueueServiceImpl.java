@@ -34,34 +34,39 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.QueuePosition;
-import com.example.demo.repository.QueueRepository;
+import com.example.demo.repository.QueuePositionRepository;
 import com.example.demo.service.QueueService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class QueueServiceImpl implements QueueService {
 
-    @Autowired
-    private QueueRepository queueRepository;
+    private final QueuePositionRepository queueRepository;
 
-    // Update position of a queue entry
-    @Override
-    public void updateQueuePosition(Long id, Integer position) {
-        Optional<QueuePosition> queueOpt = queueRepository.findById(id);
-        if (queueOpt.isPresent()) {
-            QueuePosition queue = queueOpt.get();
-            queue.setPosition(position);
-            queueRepository.save(queue);
-        }
+    public QueueServiceImpl(QueuePositionRepository queueRepository) {
+        this.queueRepository = queueRepository;
     }
 
-    // Get position of a queue entry
     @Override
-    public Integer getPosition(Long id) {
-        Optional<QueuePosition> queueOpt = queueRepository.findById(id);
-        return queueOpt.map(QueuePosition::getPosition).orElse(null);
+    public QueuePosition create(QueuePosition queue) {
+        return queueRepository.save(queue);
+    }
+
+    @Override
+    public List<QueuePosition> getAll() {
+        return queueRepository.findAll();
+    }
+
+    @Override
+    public QueuePosition getById(Long id) {
+        return queueRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Queue not found"));
+    }
+
+    @Override
+    public void delete(Long id) {
+        queueRepository.deleteById(id);
     }
 }
