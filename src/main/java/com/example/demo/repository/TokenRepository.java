@@ -13,6 +13,12 @@
 package com.example.demo.repository;
 
 import com.example.demo.entity.Token;
+import com.example.demo.entity.TokenStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TokenRepository extends JpaRepository<Token, Long> {}
+public interface TokenRepository extends JpaRepository<Token, Long> {
+
+    Token findFirstByServiceCounter_IdAndStatusOrderByIssuedAtAsc(
+            Long counterId, TokenStatus status
+    );
+}
