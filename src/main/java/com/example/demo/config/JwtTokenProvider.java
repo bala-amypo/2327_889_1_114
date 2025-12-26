@@ -58,7 +58,7 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final String secretKey; // your secret key
+    private final String secretKey; // secret key
     private final long validityInMilliseconds; // token validity in ms
 
     // Default constructor
@@ -73,12 +73,12 @@ public class JwtTokenProvider {
         Date expiry = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
-                .setSubject(user.getName())       // replace getName() with your getter
-                .claim("id", user.getId())        // replace getId() with your getter
-                .claim("email", user.getEmail())  // replace getEmail() with your getter
+                .setSubject(user.getUsername())       // <-- fixed getter
+                .claim("id", user.getId())            // use correct getter
+                .claim("email", user.getEmail())      // use correct getter
                 .setIssuedAt(now)
                 .setExpiration(expiry)
-                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes()) // old style for jjwt 0.9.x
+                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes()) // jjwt 0.9.x style
                 .compact();
     }
 
