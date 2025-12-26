@@ -48,26 +48,4 @@
 //                 .getBody();
 //     }
 // }
-import io.jsonwebtoken.*;
-import java.util.Date;
-import java.security.Key;
-import io.jsonwebtoken.security.Keys;
-import com.example.demo.entity.User;
-
-public class JwtTokenProvider {
-
-    private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-
-    public String generateToken(User user) {
-        return Jwts.builder()
-            .setSubject(user.getEmail())
-            .setIssuedAt(new Date())
-            .signWith(key)
-            .compact();
-    }
-
-    public Jws<Claims> getClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-    }
-}
 
