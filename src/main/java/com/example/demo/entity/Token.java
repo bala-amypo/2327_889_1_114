@@ -56,4 +56,7 @@ public class Token {
 
     private boolean expired;
     private boolean revoked;
+
+    // ✅ THIS FIELD IS MISSING – MUST ADD
+    private Integer queuePosition;
 }
