@@ -24,12 +24,14 @@ public class UserService {
     }
 
     public User register(User user) {
-        user.setPassword(encoder.encode(user.getPassword())); // tests 25,48
-        user.setRole("USER");
+        // Encrypt password
+        user.setPassword(encoder.encode(user.getPassword()));
+        // Set default role
+        user.setRole("USER");  // now works because 'role' exists
         return repo.save(user);
     }
 
-    public boolean matches(String raw, String hashed) {
-        return encoder.matches(raw, hashed);
+    public User findByUsername(String username) {
+        return repo.findByUsername(username).orElse(null);
     }
 }

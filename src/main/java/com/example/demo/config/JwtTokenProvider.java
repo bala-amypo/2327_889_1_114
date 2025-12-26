@@ -50,73 +50,62 @@
 // }
 package com.example.demo.config;
 
+import com.example.demo.entity.User;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
-    private final String secretKey; // your secret key
-    private final long validityInMilliseconds; // token validity in ms
+    private final String secret = "MySuperSecretKeyForJWTGeneration12345"; // should be 256-bit for HS512
+    private final long expirationInMs = 3600000; // 1 hour
 
-    // Default constructor
-    public JwtTokenProvider() {
-        this.secretKey = "mySecretKey12345678901234567890"; // minimum 256 bits for HS256
-        this.validityInMilliseconds = 3600000; // 1 hour
+    private Key key() {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    // Generate token from User object
-    public String generateToken(com.example.demo.entity.User user) {
+    // Generate token for User
+    public String generateToken(User user) {
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + validityInMilliseconds);
+        Date expiryDate = new Date(now.getTime() + expirationInMs);
 
         return Jwts.builder()
-                .setSubject(user.getName())       // <-- FIXED getter, replace with your correct getter
-                .claim("id", user.getId())        // replace with your getter
-                .claim("email", user.getEmail())  // replace with your getter
+                .setSubject(user.getUsername())  // replaced getName() with getUsername()
+                .claim("email", user.getEmail())
+                .claim("role", user.getRole())
                 .setIssuedAt(now)
-                .setExpiration(expiry)
-                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes()) // old jjwt 0.9.x style
+                .setExpiration(expiryDate)
+                .signWith(key(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
     // Validate token
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(key())
+                    .build()
+                    .parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
+        } catch (JwtException ex) {
+            ex.printStackTrace();
         }
+        return false;
     }
 
     // Get username from token
-    public String getUsername(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey.getBytes())
+    public String getUsernameFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
-    }
-
-    // Get user ID from token
-    public Long getUserId(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey.getBytes())
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.get("id", Long.class);
-    }
-
-    // Get email from token
-    public String getEmail(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey.getBytes())
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.get("email", String.class);
     }
 }
 

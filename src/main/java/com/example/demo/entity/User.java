@@ -66,7 +66,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "users")
-@Data  // Lombok generates getters, setters, toString, equals, hashCode
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -84,5 +84,6 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    // Optional: add roles, createdAt, updatedAt, etc.
+    @Column(nullable = false)
+    private String role;  // Added role field
 }

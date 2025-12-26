@@ -44,7 +44,7 @@ package com.example.demo.controller;
 
 import com.example.demo.config.JwtTokenProvider;
 import com.example.demo.entity.User;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,42 +52,27 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
 
     @Autowired
-    public AuthController(JwtTokenProvider jwtTokenProvider, UserRepository userRepository) {
+    public AuthController(UserService userService, JwtTokenProvider jwtTokenProvider) {
+        this.userService = userService;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.userRepository = userRepository;
+    }
+
+    @PostMapping("/register")
+    public String register(@RequestBody User user) {
+        User savedUser = userService.register(user);
+        return "User registered with username: " + savedUser.getUsername();
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam Long userId) {
-        // Fetch User from repository
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Generate JWT token
-        return jwtTokenProvider.generateToken(user);
-    }
-
-    @GetMapping("/validate")
-    public boolean validateToken(@RequestParam String token) {
-        return jwtTokenProvider.validateToken(token);
-    }
-
-    @GetMapping("/username")
-    public String getUsername(@RequestParam String token) {
-        return jwtTokenProvider.getUsername(token);
-    }
-
-    @GetMapping("/userId")
-    public Long getUserId(@RequestParam String token) {
-        return jwtTokenProvider.getUserId(token);
-    }
-
-    @GetMapping("/email")
-    public String getEmail(@RequestParam String token) {
-        return jwtTokenProvider.getEmail(token);
+    public String login(@RequestBody User user) {
+        User existingUser = userService.findByUsername(user.getUsername());
+        if (existingUser != null) {
+            return jwtTokenProvider.generateToken(existingUser);
+        }
+        return "Invalid credentials";
     }
 }
