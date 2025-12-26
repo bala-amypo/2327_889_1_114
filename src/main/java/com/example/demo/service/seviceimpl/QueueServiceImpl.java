@@ -33,23 +33,20 @@
 // }
 package com.example.demo.service.impl;
 
-import com.example.demo.entity.Token;
-import com.example.demo.entity.TokenStatus;
-import com.example.demo.repository.TokenRepository;
 import com.example.demo.service.QueueService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class QueueServiceImpl implements QueueService {
 
-    @Autowired
-    private TokenRepository tokenRepository;
+    @Override
+    public Integer getPosition(Long tokenId) {
+        // implement your logic
+        return 1;
+    }
 
     @Override
-    public List<Token> getWaitingTokensByCounter(Long counterId) {
-        return tokenRepository.findByServiceCounter_IdAndStatusOrderByIssuedAtAsc(counterId, TokenStatus.WAITING);
+    public void updateQueuePosition(Long tokenId, Integer newPosition) {
+        // implement your logic
     }
 }
