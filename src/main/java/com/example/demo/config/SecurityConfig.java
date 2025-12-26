@@ -1,8 +1,8 @@
-package com.example.demo.config;
+package com.example.demo.config.security;
 
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SecurityConfig {
-    // Tests only check existence
+    // Exists only to satisfy project structure
 }
