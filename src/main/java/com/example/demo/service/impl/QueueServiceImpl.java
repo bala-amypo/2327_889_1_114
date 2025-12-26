@@ -32,32 +32,26 @@ package com.example.demo.service.impl;
 import com.example.demo.entity.Token;
 import com.example.demo.repository.TokenRepository;
 import com.example.demo.service.QueueService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class QueueServiceImpl implements QueueService {
 
-    private final TokenRepository tokenRepository;
-
-    public QueueServiceImpl(TokenRepository tokenRepository) {
-        this.tokenRepository = tokenRepository;
-    }
+    @Autowired
+    private TokenRepository tokenRepository;
 
     @Override
-    public Integer getPosition(Long tokenId) {
-        return tokenRepository.findById(tokenId)
-                .orElseThrow()
-                .getQueuePosition();
-    }
-
-    @Override
-    public void updatePosition(Long tokenId, Integer newPosition) {
-        if (newPosition <= 0) {
-            throw new IllegalArgumentException("Invalid position");
+    public void updateQueuePosition(Long tokenId, Integer newPosition) {
+        Optional<Token> optionalToken = tokenRepository.findById(tokenId);
+        if (optionalToken.isPresent()) {
+            Token token = optionalToken.get();
+            token.setQueuePosition(newPosition);
+            tokenRepository.save(token);
         }
-
-        Token token = tokenRepository.findById(tokenId).orElseThrow();
-        token.setQueuePosition(newPosition);
-        tokenRepository.save(token);
     }
+
+    // Add other QueueService methods if needed
 }
