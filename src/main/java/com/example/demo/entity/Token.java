@@ -39,30 +39,21 @@
 // }
 package com.example.demo.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 public class Token {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer queuePosition;
+    private String token;
 
-    // Other fields...
-
-    // Getter and Setter for queuePosition
-    public Integer getQueuePosition() {
-        return queuePosition;
-    }
-
-    public void setQueuePosition(Integer queuePosition) {
-        this.queuePosition = queuePosition;
-    }
-
-    // Other getters and setters...
+    private boolean expired;
+    private boolean revoked;
 }
