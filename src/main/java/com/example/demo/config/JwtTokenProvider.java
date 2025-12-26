@@ -50,31 +50,41 @@
 // }
 package com.example.demo.config;
 
-import com.example.demo.entity.User;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
+
+import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
-    private final String secret = "mySecretKey123456";
+    private final Key key;
+    private final long expiryMs;
 
-    public String generateToken(User user) {
-        return Jwts.builder()
-                .setSubject(String.valueOf(user.getId()))
-                .claim("role", user.getRole())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
+    // Constructor with secret + expiry
+    public JwtTokenProvider(String secret, int expiryMs) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.expiryMs = expiryMs;
     }
 
-    public Claims validate(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+    // Default constructor for Spring
+    public JwtTokenProvider() {
+        this.key = Keys.hmacShaKeyFor("mysecretkeymysecretkeymysecretkey".getBytes());
+        this.expiryMs = 86400000; // 1 day
+    }
+
+    // Method used by AuthController
+    public String generateToken(Long userId, String email, String role) {
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("id", userId)
+                .claim("role", role)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiryMs))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 }
 
