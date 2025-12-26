@@ -48,4 +48,42 @@
 //                 .getBody();
 //     }
 // }
+package com.example.demo.config;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.stereotype.Component;
+import com.example.demo.entity.User;
+import java.util.Date;
+
+@Component
+public class JwtTokenProvider {
+
+    private final String SECRET_KEY = "your-secret-key";
+    private final long VALIDITY_IN_MS = 3600000; // 1 hour
+
+    public String generateToken(User user) {
+        Claims claims = Jwts.claims().setSubject(user.getEmail());
+        claims.put("role", user.getRole());
+
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + VALIDITY_IN_MS);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
+    }
+
+    public Claims getClaims(String token) {
+        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+    }
+
+    public String getEmailFromToken(String token) {
+        return getClaims(token).getSubject();
+    }
+}
 
