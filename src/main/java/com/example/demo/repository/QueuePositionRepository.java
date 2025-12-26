@@ -19,5 +19,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface QueueRepository extends JpaRepository<QueuePosition, Long> {
-    // You can add custom queries here if needed
+    // Add custom queries if needed
 }
