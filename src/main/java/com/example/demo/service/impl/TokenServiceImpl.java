@@ -69,47 +69,31 @@ package com.example.demo.service.impl;
 import com.example.demo.entity.Token;
 import com.example.demo.repository.TokenRepository;
 import com.example.demo.service.TokenService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TokenServiceImpl implements TokenService {
 
-    private final TokenRepository tokenRepository;
+    @Autowired
+    private TokenRepository tokenRepository;
 
-    public TokenServiceImpl(TokenRepository tokenRepository) {
-        this.tokenRepository = tokenRepository;
+    @Override
+    public Token getToken(Long id) {
+        return tokenRepository.findById(id).orElse(null);
     }
 
     @Override
-    public List<Token> getAllTokens() {
-        return tokenRepository.findAll();
+    public void updateQueuePosition(Long tokenId, Integer newPosition) {
+        Optional<Token> optionalToken = tokenRepository.findById(tokenId);
+        if (optionalToken.isPresent()) {
+            Token token = optionalToken.get();
+            token.setQueuePosition(newPosition);
+            tokenRepository.save(token);
+        }
     }
 
-    @Override
-    public Token updateStatus(Long tokenId, String status) {
-        Token token = tokenRepository.findById(tokenId).orElseThrow();
-
-        token.setStatus(status);
-
-        if ("COMPLETED".equalsIgnoreCase(status)) {
-            token.setCompletedAt(LocalDateTime.now());
-        }
-
-        if ("CANCELLED".equalsIgnoreCase(status)) {
-            List<Token> tokens = tokenRepository.findAll();
-            int pos = 1;
-
-            for (Token t : tokens) {
-                if (!"CANCELLED".equalsIgnoreCase(t.getStatus())) {
-                    t.setQueuePosition(pos++);
-                    tokenRepository.save(t);
-                }
-            }
-        }
-
-        return tokenRepository.save(token);
-    }
+    // Add other TokenService methods if needed
 }
