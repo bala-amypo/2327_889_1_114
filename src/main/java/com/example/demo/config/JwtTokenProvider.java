@@ -68,12 +68,12 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + expirationInMs);
 
         return Jwts.builder()
-                .setSubject(user.getUsername())  // use username instead of getName()
+                .setSubject(user.getUsername()) // use username
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, secret.getBytes()) // compatible with jjwt 0.9.x
+                .signWith(SignatureAlgorithm.HS512, secret.getBytes()) // compatible with JJWT 0.9.x
                 .compact();
     }
 
@@ -81,8 +81,8 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .setSigningKey(secret.getBytes())
-                    .parseClaimsJws(token);
+                .setSigningKey(secret.getBytes())
+                .parseClaimsJws(token);
             return true;
         } catch (JwtException ex) {
             ex.printStackTrace();

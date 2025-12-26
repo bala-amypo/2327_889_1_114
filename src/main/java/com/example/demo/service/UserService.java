@@ -23,15 +23,20 @@ public class UserService {
         this.repo = repo;
     }
 
+    // Register a new user
     public User register(User user) {
-        // Encrypt password
         user.setPassword(encoder.encode(user.getPassword()));
-        // Set default role
-        user.setRole("USER");  // now works because 'role' exists
+        user.setRole("USER");
         return repo.save(user);
     }
 
+    // Find user by username
     public User findByUsername(String username) {
         return repo.findByUsername(username).orElse(null);
+    }
+
+    // Find user by email
+    public User findByEmail(String email) {
+        return repo.findByEmail(email).orElse(null);
     }
 }
