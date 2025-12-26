@@ -93,18 +93,25 @@ public class TokenServiceImpl {
         this.tokenRepo = tokenRepo;
     }
 
-    public Token generateToken(ServiceCounter counter) {
-
+    // Used by TokenController
+    public Token issueToken(Long counterId) {
         Token token = new Token();
-        token.setServiceCounter(counter);
         token.setStatus(TokenStatus.WAITING);
         token.setIssuedAt(LocalDateTime.now());
         token.setTokenNumber("T" + System.currentTimeMillis());
-
         return tokenRepo.save(token);
     }
 
-    public Token getNextToken(Long counterId) {
+    public Token updateStatus(Long tokenId, String status) {
+        Token token = tokenRepo.findById(tokenId).orElseThrow();
+        token.setStatus(TokenStatus.valueOf(status));
+        if (token.getStatus() == TokenStatus.COMPLETED) {
+            token.setCompletedAt(LocalDateTime.now());
+        }
+        return tokenRepo.save(token);
+    }
+
+    public Token getToken(Long counterId) {
         return tokenRepo.findFirstByServiceCounter_IdAndStatusOrderByIssuedAtAsc(
                 counterId, TokenStatus.WAITING
         );
