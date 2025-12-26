@@ -1,8 +1,10 @@
-
 package com.example.demo.repository;
 
-import com.example.demo.entity.Token;
+import com.example.demo.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.*;
 
-public interface TokenRepository extends JpaRepository<Token, Long> {
+public interface TokenRepository extends JpaRepository<Token,Long> {
+    Optional<Token> findByTokenNumber(String tokenNumber);
+    List<Token> findByServiceCounter_IdAndStatusOrderByIssuedAtAsc(Long counterId, String status);
 }
