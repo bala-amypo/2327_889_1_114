@@ -71,7 +71,9 @@ import com.example.demo.entity.TokenStatus;
 import com.example.demo.repository.TokenRepository;
 import com.example.demo.service.TokenService;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class TokenServiceImpl implements TokenService {
@@ -88,8 +90,22 @@ public class TokenServiceImpl implements TokenService {
 
         token.setStatus(status);
 
+        // ✅ When COMPLETED → set servedAt
         if (status == TokenStatus.COMPLETED) {
             token.setServedAt(LocalDateTime.now());
+        }
+
+        // ✅ When CANCELLED → reorder queue
+        if (status == TokenStatus.CANCELLED) {
+            List<Token> tokens = tokenRepository.findAll();
+            int pos = 1;
+
+            for (Token t : tokens) {
+                if (t.getStatus() != TokenStatus.CANCELLED) {
+                    t.setQueuePosition(pos++);
+                    tokenRepository.save(t);
+                }
+            }
         }
 
         return tokenRepository.save(token);
