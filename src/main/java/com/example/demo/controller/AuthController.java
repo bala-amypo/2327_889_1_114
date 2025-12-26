@@ -24,7 +24,8 @@ public class AuthController {
     // Register a new user
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User newUser) {
-        if (userRepository.findByEmail(newUser.getEmail()) != null) {
+        User existingUser = userRepository.findByEmail(newUser.getEmail()).orElse(null);
+        if (existingUser != null) {
             return ResponseEntity.badRequest().body("Email already exists!");
         }
 
@@ -38,7 +39,7 @@ public class AuthController {
     // Login user
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.getEmail());
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElse(null);
 
         if (user == null || !passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return ResponseEntity.status(401).body("Invalid email or password!");
