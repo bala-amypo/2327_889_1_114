@@ -5,8 +5,10 @@ import com.example.demo.entity.ServiceCounter;
 import java.util.List;
 
 public interface ServiceCounterService {
+
     ServiceCounter create(ServiceCounter counter);
+
     List<ServiceCounter> getAll();
+
     ServiceCounter getById(Long id);
-    List<ServiceCounter> getActiveCounters(); // include this if required
 }

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/service-counters")
+@RequestMapping("/api/service-counter")
 public class ServiceCounterController {
 
     private final ServiceCounterService serviceCounterService;
@@ -17,23 +17,18 @@ public class ServiceCounterController {
         this.serviceCounterService = serviceCounterService;
     }
 
-    @PostMapping
-    public ServiceCounter createCounter(@RequestBody ServiceCounter counter) {
+    @PostMapping("/create")
+    public ServiceCounter create(@RequestBody ServiceCounter counter) {
         return serviceCounterService.create(counter);
     }
 
-    @GetMapping
-    public List<ServiceCounter> getAllCounters() {
+    @GetMapping("/all")
+    public List<ServiceCounter> getAll() {
         return serviceCounterService.getAll();
     }
 
     @GetMapping("/{id}")
-    public ServiceCounter getCounterById(@PathVariable Long id) {
+    public ServiceCounter getById(@PathVariable Long id) {
         return serviceCounterService.getById(id);
-    }
-
-    @GetMapping("/active")
-    public List<ServiceCounter> getActiveCounters() {
-        return serviceCounterService.getActiveCounters();
     }
 }
