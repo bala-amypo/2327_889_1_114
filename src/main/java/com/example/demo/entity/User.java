@@ -59,31 +59,32 @@
 //         this.role = role;
 //     }
 // }
-package com.example.demo.entity;
+package com.example.demo.service;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.example.demo.entity.User;
+import com.example.demo.repository.UserRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
-@Entity
-@Table(name = "users")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class User {
+@Service
+public class UserService {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private final UserRepository repo;
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    public UserService(UserRepository repo) {
+        this.repo = repo;
+    }
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    // Register new user
+    public User register(User user) {
+        user.setPassword(encoder.encode(user.getPassword()));
+        user.setRole("USER");  // default role
+        return repo.save(user);
+    }
 
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
-    private String role;  // Added role field
+    // Find user by username
+    public User findByUsername(String username) {
+        return repo.findByUsername(username).orElse(null);  // uses new repository method
+    }
 }
