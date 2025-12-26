@@ -38,6 +38,8 @@ import com.example.demo.repository.QueuePositionRepository;
 import com.example.demo.service.QueueService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class QueueServiceImpl implements QueueService {
 
@@ -47,33 +49,29 @@ public class QueueServiceImpl implements QueueService {
         this.queueRepository = queueRepository;
     }
 
-    // Add to queue
+    // ================= Interface methods =================
+
     @Override
+    public void updateQueuePosition(Long id, Integer newPosition) {
+        QueuePosition qp = queueRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Queue not found"));
+
+        qp.setPosition(newPosition);
+        queueRepository.save(qp);
+    }
+
+    @Override
+    public QueuePosition getPosition(Long id) {
+        return queueRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Queue not found"));
+    }
+
+    // ================= Extra methods (NO @Override here) =================
+
     public QueuePosition addToQueue(QueuePosition queue) {
         return queueRepository.save(queue);
     }
 
-    // Update queue position (RETURN TYPE MUST BE void)
-    @Override
-    public void updateQueuePosition(Long id, Integer position) {
-        QueuePosition queue = queueRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Queue not found"));
-
-        queue.setPosition(position);
-        queueRepository.save(queue);
-    }
-
-    // Get position
-    @Override
-    public Integer getPosition(Long id) {
-        QueuePosition queue = queueRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Queue not found"));
-
-        return queue.getPosition();
-    }
-
-    // Remove from queue
-    @Override
     public void removeFromQueue(Long id) {
         queueRepository.deleteById(id);
     }
