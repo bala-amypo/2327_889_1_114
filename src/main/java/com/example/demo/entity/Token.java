@@ -1,4 +1,3 @@
-
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
@@ -8,68 +7,33 @@ import java.time.LocalDateTime;
 public class Token {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
+    @Column(unique = true)
     private String tokenNumber;
 
-    private boolean used;
-
-    private LocalDateTime createdAt;
-
-    @Enumerated(EnumType.STRING)
-    private ServiceCounter serviceCounter;
+    private String status = "WAITING";
 
     @ManyToOne
-    private User user;
+    private ServiceCounter serviceCounter;
 
-    public Token() {}
+    private LocalDateTime issuedAt = LocalDateTime.now();
+    private LocalDateTime completedAt;
 
-    public Token(String tokenNumber, ServiceCounter serviceCounter, User user) {
-        this.tokenNumber = tokenNumber;
-        this.serviceCounter = serviceCounter;
-        this.user = user;
-        this.used = false;
-        this.createdAt = LocalDateTime.now();
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getId() {
-        return id;
-    }
+    public String getTokenNumber() { return tokenNumber; }
+    public void setTokenNumber(String tokenNumber) { this.tokenNumber = tokenNumber; }
 
-    public String getTokenNumber() {
-        return tokenNumber;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setTokenNumber(String tokenNumber) {
-        this.tokenNumber = tokenNumber;
-    }
+    public ServiceCounter getServiceCounter() { return serviceCounter; }
+    public void setServiceCounter(ServiceCounter serviceCounter) { this.serviceCounter = serviceCounter; }
 
-    public boolean isUsed() {
-        return used;
-    }
-
-    public void setUsed(boolean used) {
-        this.used = used;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public ServiceCounter getServiceCounter() {
-        return serviceCounter;
-    }
-
-    public void setServiceCounter(ServiceCounter serviceCounter) {
-        this.serviceCounter = serviceCounter;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+    public LocalDateTime getIssuedAt() { return issuedAt; }
+    public LocalDateTime getCompletedAt() { return completedAt; }
+    public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
 }
