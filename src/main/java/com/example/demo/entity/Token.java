@@ -5,37 +5,71 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tokens")
 public class Token {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String token;
+    private String tokenNumber;
+
+    private boolean used;
+
+    private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
-    private TokenStatus status;
-
-    @ManyToOne
-    @JoinColumn(name = "service_counter_id")
     private ServiceCounter serviceCounter;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @ManyToOne
+    private User user;
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Token() {}
 
-    public String getToken() { return token; }
-    public void setToken(String token) { this.token = token; }
+    public Token(String tokenNumber, ServiceCounter serviceCounter, User user) {
+        this.tokenNumber = tokenNumber;
+        this.serviceCounter = serviceCounter;
+        this.user = user;
+        this.used = false;
+        this.createdAt = LocalDateTime.now();
+    }
 
-    public TokenStatus getStatus() { return status; }
-    public void setStatus(TokenStatus status) { this.status = status; }
+    public Long getId() {
+        return id;
+    }
 
-    public ServiceCounter getServiceCounter() { return serviceCounter; }
-    public void setServiceCounter(ServiceCounter serviceCounter) { this.serviceCounter = serviceCounter; }
+    public String getTokenNumber() {
+        return tokenNumber;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setTokenNumber(String tokenNumber) {
+        this.tokenNumber = tokenNumber;
+    }
+
+    public boolean isUsed() {
+        return used;
+    }
+
+    public void setUsed(boolean used) {
+        this.used = used;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public ServiceCounter getServiceCounter() {
+        return serviceCounter;
+    }
+
+    public void setServiceCounter(ServiceCounter serviceCounter) {
+        this.serviceCounter = serviceCounter;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
