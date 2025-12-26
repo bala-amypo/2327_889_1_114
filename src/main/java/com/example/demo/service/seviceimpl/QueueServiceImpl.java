@@ -38,8 +38,6 @@ import com.example.demo.repository.QueuePositionRepository;
 import com.example.demo.service.QueueService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class QueueServiceImpl implements QueueService {
 
@@ -49,24 +47,34 @@ public class QueueServiceImpl implements QueueService {
         this.queueRepository = queueRepository;
     }
 
+    // Add user to queue
     @Override
-    public QueuePosition create(QueuePosition queue) {
+    public QueuePosition addToQueue(QueuePosition queue) {
         return queueRepository.save(queue);
     }
 
+    // Update queue position
     @Override
-    public List<QueuePosition> getAll() {
-        return queueRepository.findAll();
-    }
-
-    @Override
-    public QueuePosition getById(Long id) {
-        return queueRepository.findById(id)
+    public QueuePosition updateQueuePosition(Long id, Integer position) {
+        QueuePosition queue = queueRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Queue not found"));
+
+        queue.setPosition(position);
+        return queueRepository.save(queue);
     }
 
+    // Get current position
     @Override
-    public void delete(Long id) {
+    public Integer getPosition(Long id) {
+        QueuePosition queue = queueRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Queue not found"));
+
+        return queue.getPosition();
+    }
+
+    // Remove from queue
+    @Override
+    public void removeFromQueue(Long id) {
         queueRepository.deleteById(id);
     }
 }
