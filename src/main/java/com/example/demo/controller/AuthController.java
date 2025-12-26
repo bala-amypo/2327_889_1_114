@@ -46,33 +46,34 @@ import com.example.demo.config.JwtTokenProvider;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final UserService userService;
-    private final JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private UserService userService;
 
     @Autowired
-    public AuthController(UserService userService, JwtTokenProvider jwtTokenProvider) {
-        this.userService = userService;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
+    private JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/register")
-    public String register(@RequestBody User user) {
+    public ResponseEntity<?> register(@RequestBody User user) {
         User savedUser = userService.register(user);
-        return "User registered with username: " + savedUser.getUsername();
+        String token = jwtTokenProvider.generateToken(savedUser);
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody User user) {
-        User existingUser = userService.findByUsername(user.getUsername());
-        if (existingUser != null) {
-            return jwtTokenProvider.generateToken(existingUser);
+    public ResponseEntity<?> login(@RequestBody User user) {
+        User savedUser = userService.findByEmail(user.getEmail());
+        if (savedUser != null && savedUser.getPassword().equals(user.getPassword())) {
+            String token = jwtTokenProvider.generateToken(savedUser);
+            return ResponseEntity.ok(token);
+        } else {
+            return ResponseEntity.badRequest().body("Invalid credentials");
         }
-        return "Invalid credentials";
     }
 }
