@@ -47,23 +47,23 @@ public class QueueServiceImpl implements QueueService {
         this.queueRepository = queueRepository;
     }
 
-    // Add user to queue
+    // Add to queue
     @Override
     public QueuePosition addToQueue(QueuePosition queue) {
         return queueRepository.save(queue);
     }
 
-    // Update queue position
+    // Update queue position (RETURN TYPE MUST BE void)
     @Override
-    public QueuePosition updateQueuePosition(Long id, Integer position) {
+    public void updateQueuePosition(Long id, Integer position) {
         QueuePosition queue = queueRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Queue not found"));
 
         queue.setPosition(position);
-        return queueRepository.save(queue);
+        queueRepository.save(queue);
     }
 
-    // Get current position
+    // Get position
     @Override
     public Integer getPosition(Long id) {
         QueuePosition queue = queueRepository.findById(id)
