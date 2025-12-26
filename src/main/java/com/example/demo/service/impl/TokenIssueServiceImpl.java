@@ -17,7 +17,7 @@ public class TokenIssueServiceImpl implements TokenIssueService {
     @Override
     public Token issue(Token token) {
         long count = tokenRepository.count();
-        token.setTokenNumber((int) count + 1);
+        token.setTokenNumber(String.valueOf(count + 1));
         return tokenRepository.save(token);
     }
 }

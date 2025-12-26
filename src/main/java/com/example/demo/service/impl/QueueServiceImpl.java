@@ -33,7 +33,6 @@ import com.example.demo.entity.Token;
 import com.example.demo.repository.TokenRepository;
 import com.example.demo.service.QueueService;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
 @Service
 public class QueueServiceImpl implements QueueService {
@@ -45,7 +44,14 @@ public class QueueServiceImpl implements QueueService {
     }
 
     @Override
-    public void updatePosition(Long tokenId, int newPosition) {
+    public Integer getPosition(Long tokenId) {
+        return tokenRepository.findById(tokenId)
+                .orElseThrow()
+                .getQueuePosition();
+    }
+
+    @Override
+    public void updatePosition(Long tokenId, Integer newPosition) {
         if (newPosition <= 0) {
             throw new IllegalArgumentException("Invalid position");
         }

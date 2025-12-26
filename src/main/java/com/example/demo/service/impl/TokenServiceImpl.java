@@ -67,7 +67,6 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.Token;
-import com.example.demo.entity.TokenStatus;
 import com.example.demo.repository.TokenRepository;
 import com.example.demo.service.TokenService;
 import org.springframework.stereotype.Service;
@@ -85,23 +84,26 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public Token updateStatus(Long tokenId, TokenStatus status) {
+    public List<Token> getAllTokens() {
+        return tokenRepository.findAll();
+    }
+
+    @Override
+    public Token updateStatus(Long tokenId, String status) {
         Token token = tokenRepository.findById(tokenId).orElseThrow();
 
         token.setStatus(status);
 
-        // ✅ When COMPLETED → set servedAt
-        if (status == TokenStatus.COMPLETED) {
-            token.setServedAt(LocalDateTime.now());
+        if ("COMPLETED".equalsIgnoreCase(status)) {
+            token.setCompletedAt(LocalDateTime.now());
         }
 
-        // ✅ When CANCELLED → reorder queue
-        if (status == TokenStatus.CANCELLED) {
+        if ("CANCELLED".equalsIgnoreCase(status)) {
             List<Token> tokens = tokenRepository.findAll();
             int pos = 1;
 
             for (Token t : tokens) {
-                if (t.getStatus() != TokenStatus.CANCELLED) {
+                if (!"CANCELLED".equalsIgnoreCase(t.getStatus())) {
                     t.setQueuePosition(pos++);
                     tokenRepository.save(t);
                 }
