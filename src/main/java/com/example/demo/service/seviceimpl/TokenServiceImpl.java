@@ -78,42 +78,31 @@
 // }
 package com.example.demo.service.impl;
 
-import com.example.demo.entity.*;
+import com.example.demo.entity.Token;
+import com.example.demo.entity.TokenStatus;
 import com.example.demo.repository.TokenRepository;
+import com.example.demo.service.TokenService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
-public class TokenServiceImpl {
+public class TokenServiceImpl implements TokenService {
 
-    private final TokenRepository tokenRepo;
+    @Autowired
+    private TokenRepository tokenRepository;
 
-    public TokenServiceImpl(TokenRepository tokenRepo) {
-        this.tokenRepo = tokenRepo;
-    }
-
-    // Used by TokenController
-    public Token issueToken(Long counterId) {
-        Token token = new Token();
+    @Override
+    public Token createToken(Token token) {
         token.setStatus(TokenStatus.WAITING);
         token.setIssuedAt(LocalDateTime.now());
-        token.setTokenNumber("T" + System.currentTimeMillis());
-        return tokenRepo.save(token);
+        return tokenRepository.save(token);
     }
 
-    public Token updateStatus(Long tokenId, String status) {
-        Token token = tokenRepo.findById(tokenId).orElseThrow();
-        token.setStatus(TokenStatus.valueOf(status));
-        if (token.getStatus() == TokenStatus.COMPLETED) {
-            token.setCompletedAt(LocalDateTime.now());
-        }
-        return tokenRepo.save(token);
-    }
-
-    public Token getToken(Long counterId) {
-        return tokenRepo.findFirstByServiceCounter_IdAndStatusOrderByIssuedAtAsc(
-                counterId, TokenStatus.WAITING
-        );
+    @Override
+    public List<Token> getAllTokens() {
+        return tokenRepository.findAll();
     }
 }
