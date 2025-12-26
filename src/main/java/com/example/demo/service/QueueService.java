@@ -9,6 +9,6 @@
 package com.example.demo.service;
 
 public interface QueueService {
-    Integer getPosition(Long tokenId);
-    void updateQueuePosition(Long tokenId, Integer newPosition);
+    void updateQueuePosition(Long id, Integer position);
+    Integer getPosition(Long id);
 }
