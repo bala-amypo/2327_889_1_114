@@ -34,19 +34,19 @@ public class FullProjectTest {
     @Test
     public void testGenerateToken() {
         User user = new User();
-        user.setUsername("sowmeia");
-        user.setRole("USER");
         user.setEmail("sowmeia@gmail.com");
+        user.setRole("USER");
 
-        when(userRepository.findByUsername("sowmeia"))
+        // If your repository has findByEmail (very common)
+        when(userRepository.findByEmail("sowmeia@gmail.com"))
                 .thenReturn(Optional.of(user));
 
-        // ✅ FIXED: generateToken accepts only (username, role)
-        when(jwtTokenProvider.generateToken("sowmeia", "USER"))
+        // generateToken expects (String, String)
+        when(jwtTokenProvider.generateToken("sowmeia@gmail.com", "USER"))
                 .thenReturn("mock-jwt-token");
 
         String token = jwtTokenProvider.generateToken(
-                user.getUsername(),
+                user.getEmail(),
                 user.getRole()
         );
 
@@ -57,19 +57,17 @@ public class FullProjectTest {
     @Test
     public void testLoginTokenCreation() {
         User user = new User();
-        user.setUsername("admin");
-        user.setRole("ADMIN");
         user.setEmail("admin@gmail.com");
+        user.setRole("ADMIN");
 
-        when(userRepository.findByUsername("admin"))
+        when(userRepository.findByEmail("admin@gmail.com"))
                 .thenReturn(Optional.of(user));
 
-        // ✅ FIXED
-        when(jwtTokenProvider.generateToken("admin", "ADMIN"))
+        when(jwtTokenProvider.generateToken("admin@gmail.com", "ADMIN"))
                 .thenReturn("admin-token");
 
         String token = jwtTokenProvider.generateToken(
-                user.getUsername(),
+                user.getEmail(),
                 user.getRole()
         );
 
@@ -79,15 +77,14 @@ public class FullProjectTest {
     @Test
     public void testAnotherTokenGeneration() {
         User user = new User();
-        user.setUsername("test");
+        user.setEmail("test@gmail.com");
         user.setRole("USER");
 
-        // ✅ FIXED
-        when(jwtTokenProvider.generateToken("test", "USER"))
+        when(jwtTokenProvider.generateToken("test@gmail.com", "USER"))
                 .thenReturn("test-token");
 
         String token = jwtTokenProvider.generateToken(
-                user.getUsername(),
+                user.getEmail(),
                 user.getRole()
         );
 
@@ -97,15 +94,14 @@ public class FullProjectTest {
     @Test
     public void testJwtTokenNotNull() {
         User user = new User();
-        user.setUsername("demo");
+        user.setEmail("demo@gmail.com");
         user.setRole("USER");
 
-        // ✅ FIXED
-        when(jwtTokenProvider.generateToken("demo", "USER"))
+        when(jwtTokenProvider.generateToken("demo@gmail.com", "USER"))
                 .thenReturn("demo-token");
 
         String token = jwtTokenProvider.generateToken(
-                user.getUsername(),
+                user.getEmail(),
                 user.getRole()
         );
 
