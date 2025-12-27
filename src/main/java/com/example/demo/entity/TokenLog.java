@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class TokenLog {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -15,7 +15,22 @@ public class TokenLog {
 
     private String logMessage;
 
-    private LocalDateTime loggedAt = LocalDateTime.now();
+    private LocalDateTime loggedAt;
+
+    @PrePersist
+    public void onCreate() {
+        loggedAt = LocalDateTime.now();
+    }
+
+    public TokenLog() {
+        loggedAt = LocalDateTime.now();
+    }
+
+    public TokenLog(Token token, String logMessage, LocalDateTime loggedAt) {
+        this.token = token;
+        this.logMessage = logMessage;
+        this.loggedAt = loggedAt;
+    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -27,4 +42,5 @@ public class TokenLog {
     public void setLogMessage(String logMessage) { this.logMessage = logMessage; }
 
     public LocalDateTime getLoggedAt() { return loggedAt; }
+    public void setLoggedAt(LocalDateTime loggedAt) { this.loggedAt = loggedAt; }
 }
