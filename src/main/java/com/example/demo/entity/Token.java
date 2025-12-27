@@ -37,26 +37,4 @@
 //     public LocalDateTime getCompletedAt() { return completedAt; }
 //     public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
 // }
-package com.example.demo.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
-@Entity
-@Getter
-@Setter
-public class Token {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String token;
-
-    private boolean expired;
-    private boolean revoked;
-
-    // ✅ THIS FIELD IS MISSING – MUST ADD
-    private Integer queuePosition;
-}

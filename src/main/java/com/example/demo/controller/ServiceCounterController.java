@@ -18,7 +18,8 @@
 // }
 package com.example.demo.controller;
 
-import com.example.demo.service.impl.TokenServiceImpl;
+import com.example.demo.entity.ServiceCounter;
+import com.example.demo.service.impl.ServiceCounterServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,40 +27,26 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/tokens")
-@Tag(name = "Token Management", description = "APIs for managing tokens and queue")
-public class TokenController {
+@RequestMapping("/api/counters")
+@Tag(name = "Service Counter Management", description = "APIs for managing service counters")
+public class ServiceCounterController {
     
     @Autowired
-    private TokenServiceImpl tokenService;
+    private ServiceCounterServiceImpl counterService;
     
-    @PostMapping("/issue/{counterId}")
-    @Operation(summary = "Issue new token", description = "Issue a new token for the specified counter")
-    public ResponseEntity<?> issueToken(@PathVariable Long counterId) {
+    @PostMapping
+    @Operation(summary = "Add counter", description = "Add a new service counter")
+    public ResponseEntity<?> addCounter(@RequestBody ServiceCounter counter) {
         try {
-            return ResponseEntity.ok(tokenService.issueToken(counterId));
+            return ResponseEntity.ok(counterService.addCounter(counter));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
     
-    @PutMapping("/{tokenId}/status")
-    @Operation(summary = "Update token status", description = "Update the status of a token")
-    public ResponseEntity<?> updateStatus(@PathVariable Long tokenId, @RequestParam String status) {
-        try {
-            return ResponseEntity.ok(tokenService.updateStatus(tokenId, status));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-    
-    @GetMapping("/{tokenId}")
-    @Operation(summary = "Get token details", description = "Get details of a specific token")
-    public ResponseEntity<?> getToken(@PathVariable Long tokenId) {
-        try {
-            return ResponseEntity.ok(tokenService.getToken(tokenId));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/active")
+    @Operation(summary = "Get active counters", description = "Get all active service counters")
+    public ResponseEntity<?> getActiveCounters() {
+        return ResponseEntity.ok(counterService.getActiveCounters());
     }
 }
