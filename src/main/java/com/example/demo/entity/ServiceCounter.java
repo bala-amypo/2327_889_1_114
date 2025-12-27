@@ -3,47 +3,34 @@ package com.example.demo.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "service_counters")
-public class ServiceCounter {
+@Table(name = "users")
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String counterName;
+    private String username;
+    private String password;
+    private String role;
 
-    private boolean active;
+    public User() {}
 
-    public ServiceCounter() {}
-
-    public ServiceCounter(Long id, String counterName, boolean active) {
+    public User(Long id, String username, String password, String role) {
         this.id = id;
-        this.counterName = counterName;
-        this.active = active;
+        this.username = username;
+        this.password = password;
+        this.role = role;
     }
 
-    public Long getId() {
-        return id;
-    }
+    // Getters and setters
+    public Long getId() { return id; }
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+    public String getRole() { return role; }
 
-    public String getCounterName() {
-        return counterName;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setCounterName(String counterName) {
-        this.counterName = counterName;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
+    public void setId(Long id) { this.id = id; }
+    public void setUsername(String username) { this.username = username; }
+    public void setPassword(String password) { this.password = password; }
+    public void setRole(String role) { this.role = role; }
 }
