@@ -18,18 +18,14 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // ✅ MUST MATCH UserService
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
-    }
-
-    @Override
-    public User saveUser(User user) {
+    public User register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
-    // ✅ MISSING METHOD FIX
+    // ✅ MUST MATCH UserService
     @Override
     public User login(String email, String password) {
         return userRepository.findByEmail(email).orElse(null);
