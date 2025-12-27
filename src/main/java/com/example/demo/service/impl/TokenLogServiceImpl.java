@@ -1,7 +1,10 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.*;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class TokenLogServiceImpl {
@@ -9,17 +12,18 @@ public class TokenLogServiceImpl {
     private final TokenLogRepository logRepo;
     private final TokenRepository tokenRepo;
 
-    public TokenLogServiceImpl(TokenLogRepository l, TokenRepository t) {
-        this.logRepo = l;
-        this.tokenRepo = t;
+    public TokenLogServiceImpl(TokenLogRepository logRepo, TokenRepository tokenRepo) {
+        this.logRepo = logRepo;
+        this.tokenRepo = tokenRepo;
     }
 
-    public TokenLog addLog(Long tokenId, String msg) {
-        Token t = tokenRepo.findById(tokenId).orElseThrow();
-        TokenLog l = new TokenLog();
-        l.setToken(t);
-        l.setLogMessage(msg);
-        return logRepo.save(l);
+    public TokenLog addLog(Long tokenId, String message) {
+
+        Token token = tokenRepo.findById(tokenId)
+                .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
+
+        TokenLog log = new TokenLog(token, message, LocalDateTime.now());
+        return logRepo.save(log);
     }
 
     public List<TokenLog> getLogs(Long tokenId) {

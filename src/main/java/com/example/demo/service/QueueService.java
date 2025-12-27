@@ -1,8 +1,8 @@
-
 package com.example.demo.service;
 
-public interface QueueService {
-    void updateQueuePosition(Long id, Integer position);
-    Integer getPosition(Long id);
-}
+import com.example.demo.entity.QueuePosition;
 
+public interface QueueService {
+    QueuePosition updateQueuePosition(Long tokenId, Integer newPosition);
+    QueuePosition getPosition(Long tokenId);
+}

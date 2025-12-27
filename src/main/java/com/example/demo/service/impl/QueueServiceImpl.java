@@ -1,30 +1,42 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.*;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.*;
+
+import java.time.LocalDateTime;
 
 public class QueueServiceImpl {
 
     private final QueuePositionRepository queueRepo;
     private final TokenRepository tokenRepo;
 
-    public QueueServiceImpl(QueuePositionRepository q, TokenRepository t) {
-        this.queueRepo = q;
-        this.tokenRepo = t;
+    public QueueServiceImpl(QueuePositionRepository queueRepo, TokenRepository tokenRepo) {
+        this.queueRepo = queueRepo;
+        this.tokenRepo = tokenRepo;
     }
 
-    public QueuePosition updateQueuePosition(Long tokenId, Integer pos) {
-        if (pos < 1) throw new IllegalArgumentException(">= 1");
+    public QueuePosition updateQueuePosition(Long tokenId, Integer newPosition) {
 
-        Token t = tokenRepo.findById(tokenId).orElseThrow(() -> new RuntimeException("not found"));
-        QueuePosition q = new QueuePosition();
-        q.setToken(t);
-        q.setPosition(pos);
-        return queueRepo.save(q);
+        if (newPosition < 1) {
+            throw new IllegalArgumentException("Position must be >= 1");
+        }
+
+        Token token = tokenRepo.findById(tokenId)
+                .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
+
+        QueuePosition qp = queueRepo.findByToken_Id(tokenId)
+                .orElse(new QueuePosition());
+
+        qp.setToken(token);
+        qp.setPosition(newPosition);
+        qp.setUpdatedAt(LocalDateTime.now());
+
+        return queueRepo.save(qp);
     }
 
     public QueuePosition getPosition(Long tokenId) {
-        return queueRepo.findByToken_Id(tokenId).orElse(null);
+        return queueRepo.findByToken_Id(tokenId)
+                .orElseThrow(() -> new ResourceNotFoundException("Queue not found"));
     }
 }
-
