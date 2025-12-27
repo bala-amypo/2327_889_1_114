@@ -1,45 +1,53 @@
 package com.example.demo.config;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
+import java.security.Key;
 import java.util.Date;
 
+@Component
 public class JwtTokenProvider {
-
-    private final String secret;
-    private final long validity;
-
-    // 🔥 Test expects this constructor
-    public JwtTokenProvider(String secret, long validity) {
-        this.secret = secret;
-        this.validity = validity;
+    private final Key key;
+    private final long expirationMillis;
+    
+    public JwtTokenProvider() {
+        this("ChangeThisSecretKeyReplaceMe1234567890", 3600000);
     }
-
-    // 🔥 Test calls this
-    public String generateToken(String email, String role) {
+    
+    public JwtTokenProvider(String secretKey, long expirationMillis) {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        this.expirationMillis = expirationMillis;
+    }
+    
+    public String generateToken(Long userId, String email, String role) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + expirationMillis);
+        
         return Jwts.builder()
-                .setSubject(email)
-                .claim("role", role)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + validity))
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
+            .setSubject(userId.toString())
+            .claim("email", email)
+            .claim("role", role)
+            .setIssuedAt(now)
+            .setExpiration(expiry)
+            .signWith(key, SignatureAlgorithm.HS256)
+            .compact();
     }
-
-    // 🔥 Test calls this
+    
     public boolean validateToken(String token) {
         try {
-            getClaims(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
-
-    // 🔥 Test calls this
+    
     public Claims getClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
     }
 }
