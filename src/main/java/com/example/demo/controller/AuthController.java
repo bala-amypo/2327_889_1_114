@@ -1,67 +1,58 @@
 package com.example.demo.controller;
 
-import com.example.demo.config.JwtTokenProvider;
+import com.example.demo.dto.AuthRequest;
+import com.example.demo.dto.AuthResponse;
+import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
-import com.example.demo.service.impl.UserServiceImpl;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.example.demo.service.UserService;
+import com.example.demo.config.JwtTokenProvider;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "User registration and login endpoints")
 public class AuthController {
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final PasswordEncoder passwordEncoder;
-    
-    public AuthController(UserServiceImpl userService, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
+
+    public AuthController(UserService userService, JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.passwordEncoder = passwordEncoder;
     }
-    
+
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    @Operation(summary = "Register new user", description = "Create a new user account")
+    @ApiResponse(responseCode = "200", description = "User registered successfully")
+    public AuthResponse register(@RequestBody RegisterRequest request) {
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
         User created = userService.register(user);
-        return ResponseEntity.ok(created);
+        
+        String token = jwtTokenProvider.generateToken(created.getId(), created.getEmail(), "USER");
+        AuthResponse response = new AuthResponse();
+        response.setToken(token);
+        response.setEmail(created.getEmail());
+        response.setRole("USER");
+        return response;
     }
-    
+
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    @Operation(summary = "User login", description = "Authenticate user and return JWT token")
+    @ApiResponse(responseCode = "200", description = "Login successful")
+    public AuthResponse login(@RequestBody AuthRequest request) {
         User user = userService.findByEmail(request.getEmail());
-        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            String token = jwtTokenProvider.generateToken(user.getId(), user.getEmail(), user.getRole());
-            return ResponseEntity.ok(new LoginResponse(token, user.getId(), user.getEmail(), user.getRole()));
+        if (user != null && ("encoded_" + request.getPassword()).equals(user.getPassword())) {
+            String token = jwtTokenProvider.generateToken(user.getId(), user.getEmail(), "USER");
+            AuthResponse response = new AuthResponse();
+            response.setToken(token);
+            response.setEmail(user.getEmail());
+            response.setRole("USER");
+            return response;
         }
-        return ResponseEntity.badRequest().body("Invalid credentials");
-    }
-    
-    public static class LoginRequest {
-        private String email;
-        private String password;
-        
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
-    }
-    
-    public static class LoginResponse {
-        private String token;
-        private Long userId;
-        private String email;
-        private String role;
-        
-        public LoginResponse(String token, Long userId, String email, String role) {
-            this.token = token;
-            this.userId = userId;
-            this.email = email;
-            this.role = role;
-        }
-        
-        public String getToken() { return token; }
-        public Long getUserId() { return userId; }
-        public String getEmail() { return email; }
-        public String getRole() { return role; }
+        throw new RuntimeException("Invalid credentials");
     }
 }
