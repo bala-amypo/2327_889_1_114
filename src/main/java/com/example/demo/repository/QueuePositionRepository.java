@@ -1,22 +1,11 @@
-// package com.example.demo.repository;
-
-// import com.example.demo.entity.*;
-// import org.springframework.data.jpa.repository.JpaRepository;
-// import java.util.*;
-
-
-// public interface QueuePositionRepository extends JpaRepository<QueuePosition,Long> {
-//     Optional<QueuePosition> findByToken_Id(Long tokenId);
-// }
 package com.example.demo.repository;
 
-import com.example.demo.entity.QueuePosition;
+import com.example.demo.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.*;
 
-import java.util.Optional;
 
-@Repository
-public interface QueuePositionRepository extends JpaRepository<QueuePosition, Long> {
+public interface QueuePositionRepository extends JpaRepository<QueuePosition,Long> {
     Optional<QueuePosition> findByToken_Id(Long tokenId);
 }
+
