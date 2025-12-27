@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.model.User;
+import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.impl.UserServiceImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,19 +11,29 @@ public class FullProjectTest {
 
     public static void main(String[] args) {
 
-        // manual dummy objects (no JUnit, no Mockito)
+        // Dummy repository (ONLY required method)
         UserRepository userRepository = new UserRepository() {
             @Override
             public Optional<User> findByEmail(String email) {
-                User u = new User();
-                u.setEmail(email);
-                return Optional.of(u);
+                User user = new User();
+                user.setEmail(email);
+                user.setPassword("1234");
+                return Optional.of(user);
             }
-
-            // implement only required methods
         };
 
-        PasswordEncoder passwordEncoder = password -> password;
+        // PasswordEncoder FIX (no lambda)
+        PasswordEncoder passwordEncoder = new PasswordEncoder() {
+            @Override
+            public String encode(CharSequence rawPassword) {
+                return rawPassword.toString();
+            }
+
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                return rawPassword.toString().equals(encodedPassword);
+            }
+        };
 
         UserServiceImpl userService =
                 new UserServiceImpl(userRepository, passwordEncoder);
