@@ -66,34 +66,114 @@
 // }
 package com.example.demo.service.impl;
 
+import com.example.demo.entity.ServiceCounter;
 import com.example.demo.entity.Token;
+import com.example.demo.entity.TokenLog;
+import com.example.demo.entity.QueuePosition;
+import com.example.demo.repository.ServiceCounterRepository;
 import com.example.demo.repository.TokenRepository;
-import com.example.demo.service.TokenService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.repository.TokenLogRepository;
+import com.example.demo.repository.QueuePositionRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Service
-public class TokenServiceImpl implements TokenService {
+public class TokenServiceImpl {
+    private final TokenRepository tokenRepository;
+    private final ServiceCounterRepository counterRepository;
+    private final TokenLogRepository logRepo;
+    private final QueuePositionRepository queueRepo;
 
-    @Autowired
-    private TokenRepository tokenRepository;
-
-    @Override
-    public Token getToken(Long id) {
-        return tokenRepository.findById(id).orElse(null);
+    public TokenServiceImpl(TokenRepository tokenRepository, 
+                           ServiceCounterRepository counterRepository,
+                           TokenLogRepository logRepo,
+                           QueuePositionRepository queueRepo) {
+        this.tokenRepository = tokenRepository;
+        this.counterRepository = counterRepository;
+        this.logRepo = logRepo;
+        this.queueRepo = queueRepo;
     }
 
-    @Override
-    public void updateQueuePosition(Long tokenId, Integer newPosition) {
-        Optional<Token> optionalToken = tokenRepository.findById(tokenId);
-        if (optionalToken.isPresent()) {
-            Token token = optionalToken.get();
-            token.setQueuePosition(newPosition);
-            tokenRepository.save(token);
+    public Token issueToken(Long counterId) {
+        ServiceCounter counter = counterRepository.findById(counterId)
+                .orElseThrow(() -> new RuntimeException("Counter not found"));
+        
+        if (!counter.getIsActive()) {
+            throw new IllegalArgumentException("Counter is not active");
         }
+
+        Token token = new Token();
+        token.setTokenNumber(generateTokenNumber());
+        token.setServiceCounter(counter);
+        token.setStatus("WAITING");
+        token.setIssuedAt(LocalDateTime.now());
+        
+        Token saved = tokenRepository.save(token);
+        
+        // Create queue position
+        List<Token> waitingTokens = tokenRepository.findByServiceCounter_IdAndStatusOrderByIssuedAtAsc(counterId, "WAITING");
+        QueuePosition queuePosition = new QueuePosition();
+        queuePosition.setToken(saved);
+        queuePosition.setPosition(waitingTokens.size());
+        queuePosition.setUpdatedAt(LocalDateTime.now());
+        queueRepo.save(queuePosition);
+        
+        // Create log entry
+        TokenLog log = new TokenLog();
+        log.setToken(saved);
+        log.setLogMessage("Token issued");
+        logRepo.save(log);
+        
+        return saved;
     }
 
-    // Add other TokenService methods if needed
+    public Token updateStatus(Long tokenId, String newStatus) {
+        Token token = tokenRepository.findById(tokenId)
+                .orElseThrow(() -> new RuntimeException("Token not found"));
+        
+        String currentStatus = token.getStatus();
+        
+        // Validate status transitions
+        if (!isValidTransition(currentStatus, newStatus)) {
+            throw new IllegalArgumentException("Invalid status transition from " + currentStatus + " to " + newStatus);
+        }
+        
+        token.setStatus(newStatus);
+        
+        if ("COMPLETED".equals(newStatus) || "CANCELLED".equals(newStatus)) {
+            token.setCompletedAt(LocalDateTime.now());
+        }
+        
+        Token saved = tokenRepository.save(token);
+        
+        // Create log entry
+        TokenLog log = new TokenLog();
+        log.setToken(saved);
+        log.setLogMessage("Status updated to " + newStatus);
+        logRepo.save(log);
+        
+        return saved;
+    }
+
+    public Token getToken(Long tokenId) {
+        return tokenRepository.findById(tokenId)
+                .orElseThrow(() -> new RuntimeException("Token not found"));
+    }
+
+    private boolean isValidTransition(String from, String to) {
+        if ("WAITING".equals(from)) {
+            return "SERVING".equals(to) || "CANCELLED".equals(to);
+        }
+        if ("SERVING".equals(from)) {
+            return "COMPLETED".equals(to) || "CANCELLED".equals(to);
+        }
+        return false;
+    }
+
+    private String generateTokenNumber() {
+        return "T-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
 }
