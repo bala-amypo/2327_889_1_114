@@ -1,110 +1,106 @@
 package com.example.demo;
 
 import com.example.demo.config.JwtTokenProvider;
-import com.example.demo.entity.User;
-import com.example.demo.repository.UserRepository;
-import com.example.demo.service.impl.UserServiceImpl;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import com.example.demo.entity.*;
+import com.example.demo.repository.*;
+import com.example.demo.service.impl.*;
+import org.mockito.*;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
+import org.testng.annotations.*;
 import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
+@Listeners(TestResultListener.class)
 public class FullProjectTest {
 
-    @Mock
-    private UserRepository userRepository;
+    @Mock private UserRepository userRepository;
+    @Mock private TokenRepository tokenRepository;
+    @Mock private ServiceCounterRepository serviceCounterRepository;
+    @Mock private TokenServiceImpl tokenService;
+    @InjectMocks private JwtTokenProvider jwtTokenProvider;
 
-    @Mock
-    private JwtTokenProvider jwtTokenProvider;
+    private User user;
+    private ServiceCounter serviceCounter;
+    private Token token;
 
-    @InjectMocks
-    private UserServiceImpl userService;
-
-    @BeforeMethod
-    public void setup() {
+    @BeforeClass
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        // Sample User
+        user = new User();
+        user.setId(1L);
+        user.setUsername("testuser");
+        user.setPassword("password");
+        user.setRole("USER");
+
+        // Sample ServiceCounter
+        serviceCounter = new ServiceCounter();
+        serviceCounter.setId(1L);
+        serviceCounter.setCounterName("Counter1");
+        serviceCounter.setActive(true);
+
+        // Sample Token
+        token = new Token();
+        token.setId(1L);
+        token.setTokenValue("sample-token");
+        token.setUser(user);
+        token.setServiceCounter(serviceCounter);
     }
 
     @Test
     public void testGenerateToken() {
-        User user = new User();
-        user.setEmail("sowmeia@gmail.com");
-        user.setRole("USER");
-
-        // If your repository has findByEmail (very common)
-        when(userRepository.findByEmail("sowmeia@gmail.com"))
-                .thenReturn(Optional.of(user));
-
-        // generateToken expects (String, String)
-        when(jwtTokenProvider.generateToken("sowmeia@gmail.com", "USER"))
-                .thenReturn("mock-jwt-token");
-
-        String token = jwtTokenProvider.generateToken(
-                user.getEmail(),
-                user.getRole()
+        // Correct token generation using the proper method signature
+        String jwtToken = jwtTokenProvider.generateToken(
+            user.getId(),
+            user.getUsername(),
+            user.getRole()
         );
 
-        Assert.assertNotNull(token);
-        Assert.assertEquals(token, "mock-jwt-token");
+        Assert.assertNotNull(jwtToken);
     }
 
     @Test
-    public void testLoginTokenCreation() {
-        User user = new User();
-        user.setEmail("admin@gmail.com");
-        user.setRole("ADMIN");
+    public void testTokenServiceSave() {
+        when(tokenRepository.save(any(Token.class))).thenReturn(token);
 
-        when(userRepository.findByEmail("admin@gmail.com"))
-                .thenReturn(Optional.of(user));
+        Token savedToken = tokenService.saveToken(token);
 
-        when(jwtTokenProvider.generateToken("admin@gmail.com", "ADMIN"))
-                .thenReturn("admin-token");
-
-        String token = jwtTokenProvider.generateToken(
-                user.getEmail(),
-                user.getRole()
-        );
-
-        Assert.assertEquals(token, "admin-token");
+        Assert.assertEquals(savedToken.getId(), token.getId());
+        Assert.assertEquals(savedToken.getUser().getUsername(), user.getUsername());
     }
 
     @Test
-    public void testAnotherTokenGeneration() {
-        User user = new User();
-        user.setEmail("test@gmail.com");
-        user.setRole("USER");
+    public void testUserRepositoryFind() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        when(jwtTokenProvider.generateToken("test@gmail.com", "USER"))
-                .thenReturn("test-token");
+        Optional<User> foundUser = userRepository.findById(1L);
 
-        String token = jwtTokenProvider.generateToken(
-                user.getEmail(),
-                user.getRole()
-        );
-
-        Assert.assertTrue(token.contains("test"));
+        Assert.assertTrue(foundUser.isPresent());
+        Assert.assertEquals(foundUser.get().getUsername(), "testuser");
     }
 
     @Test
-    public void testJwtTokenNotNull() {
-        User user = new User();
-        user.setEmail("demo@gmail.com");
-        user.setRole("USER");
+    public void testServiceCounterRepositoryFind() {
+        when(serviceCounterRepository.findById(1L)).thenReturn(Optional.of(serviceCounter));
 
-        when(jwtTokenProvider.generateToken("demo@gmail.com", "USER"))
-                .thenReturn("demo-token");
+        Optional<ServiceCounter> foundCounter = serviceCounterRepository.findById(1L);
 
-        String token = jwtTokenProvider.generateToken(
-                user.getEmail(),
-                user.getRole()
-        );
+        Assert.assertTrue(foundCounter.isPresent());
+        Assert.assertEquals(foundCounter.get().getCounterName(), "Counter1");
+    }
 
-        Assert.assertNotNull(token);
+    @Test
+    public void testTokenLogPrePersist() {
+        TokenLog tokenLog = new TokenLog();
+        tokenLog.setToken(token);
+
+        tokenLog.onCreate();
+
+        Assert.assertNotNull(tokenLog.getCreatedAt());
     }
 }
