@@ -1,56 +1,38 @@
 package com.example.demo.config;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
+import java.util.*;
 
-import javax.crypto.SecretKey;
-import java.util.Date;
-
-@Component
 public class JwtTokenProvider {
-    private final SecretKey key;
-    private final long expirationMillis;
 
-    public JwtTokenProvider(String secretKey, long expirationMillis) {
-        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
-        this.expirationMillis = expirationMillis;
-    }
+    private final byte[] secret;
+    private final long expiry;
 
-    public JwtTokenProvider() {
-        this("ChangeThisSecretKeyReplaceMe1234567890", 3600000);
+    public JwtTokenProvider(String secret, long expiry) {
+        this.secret = secret.getBytes();
+        this.expiry = expiry;
     }
 
     public String generateToken(Long userId, String email, String role) {
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + expirationMillis);
-
         return Jwts.builder()
-                .setSubject(userId.toString())
+                .setSubject(String.valueOf(userId))
                 .claim("email", email)
                 .claim("role", role)
-                .setIssuedAt(now)
-                .setExpiration(expiry)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiry))
+                .signWith(Keys.hmacShaKeyFor(secret))
                 .compact();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
-            return false;
-        }
+        } catch (Exception e) { return false; }
     }
 
     public Claims getClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token).getBody();
     }
 }
