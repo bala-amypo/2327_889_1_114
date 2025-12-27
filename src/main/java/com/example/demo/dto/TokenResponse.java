@@ -1,15 +1,17 @@
 package com.example.demo.dto;
 
-public class TokenResponse {
+public class TokenResponseDTO {
+    private String tokenNumber;
+    private String status;
+    private Integer position;
 
-    private String token;
-
-    public TokenResponse() {}
-
-    public TokenResponse(String token) {
-        this.token = token;
+    public TokenResponseDTO(String tokenNumber, String status, Integer position) {
+        this.tokenNumber = tokenNumber;
+        this.status = status;
+        this.position = position;
     }
 
-    public String getToken() { return token; }
-    public void setToken(String token) { this.token = token; }
+    public String getTokenNumber() { return tokenNumber; }
+    public String getStatus() { return status; }
+    public Integer getPosition() { return position; }
 }
