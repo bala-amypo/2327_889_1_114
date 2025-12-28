@@ -1,36 +1,78 @@
-package com.example.demo.util;
+package com.example.demo.security;
 
+import com.example.demo.entity.User;
 import io.jsonwebtoken.*;
-import java.util.Date;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+@Component
 public class JwtUtil {
 
-    private static final String SECRET = "ChangeThisSecretKeyReplaceMe1234567890";
+    private final String secret = "mySuperSecretKeyThatIsAtLeast32CharactersLong123";
+    private final long expirationSeconds = 86400;
 
-    public static String generateToken(String subject) {
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private Date getExpirationDate() {
+        return new Date(System.currentTimeMillis() + expirationSeconds * 1000);
+    }
+
+    public String generateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
+                .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
-                .signWith(SignatureAlgorithm.HS256, SECRET)
+                .setExpiration(getExpirationDate())
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public static boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                    .setSigningKey(SECRET)
-                    .parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    public String generateTokenForUser(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        claims.put("email", user.getEmail());
+        claims.put("role", user.getRole());
+        return generateToken(claims, user.getEmail());
     }
 
-    public static Claims getClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET)
-                .parseClaimsJws(token)
-                .getBody();
+    public Jws<Claims> parseToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token);
+    }
+
+    public String extractUsername(String token) {
+        return parseToken(token).getBody().getSubject();
+    }
+
+    public String extractRole(String token) {
+        return parseToken(token).getBody().get("role", String.class);
+    }
+
+    public Long extractUserId(String token) {
+        Object id = parseToken(token).getBody().get("userId");
+        if (id instanceof Integer) {
+            return ((Integer) id).longValue();
+        }
+        return (Long) id;
+    }
+
+    public boolean isTokenValid(String token, String expectedUsername) {
+        try {
+            Claims claims = parseToken(token).getBody();
+            return claims.getSubject().equals(expectedUsername)
+                    && claims.getExpiration().after(new Date());
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }
