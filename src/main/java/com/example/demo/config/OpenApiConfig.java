@@ -25,7 +25,7 @@ public class OpenApiConfig {
                         .description("API documentation for AmyPO test cases")
                 )
                 .servers(List.of(
-                        new Server().url("https://9143.32procr.amypo.ai/")
+                        new Server().url("https://9297.pro604cr.amypo.ai/")
                 ))
                 // 🔐 Enable Authorize button
                 .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
